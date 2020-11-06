@@ -52,8 +52,7 @@ class Buy(OperationBase):
     NAME = "Buy"
 
     def __init__(self, goods, position, coin=0, empty=0, target=("ms", "ps")):
-        self.goods = goods.id
-        self.price = goods.price
+        self.goods = goods
         self.pos = position
         self.coin = coin
 
@@ -63,15 +62,16 @@ class Buy(OperationBase):
     def __call__(self, states, controller=None, market=None):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
-        if ps[self.coin] < self.price:
+        self.goods.update()
+        if ps[self.coin] < self.goods.price:
             warnings.warn("货币不足，错误代码0x0011")
             return 0x0011
         elif ms[self.pos] != self.empty:
             warnings.warn("你正在将一个物体放置到非空位置，错误代码0x0002")
             return 0x0002
         else:
-            ps[self.coin] -= self.price
-            ms[self.pos] = self.goods
+            ps[self.coin] -= self.goods.price
+            ms[self.pos] = self.goods.id
 
 
 class SetState(OperationBase):

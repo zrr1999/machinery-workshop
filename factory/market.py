@@ -4,15 +4,20 @@
 # @Author : 詹荣瑞
 # @File : market.py
 # @desc : 本代码未经授权禁止商用
+from .state import VectorState
+
+
 class Market(object):
 
     def __init__(self, materials):
+        values = [1, 1, 1]
         self.names = []
-        self.prices = []
-        for m in materials:
+        for i, m in enumerate(materials):
             self.names.append(m.name)
-            self.prices.append(m.price)
+            values.append(m.price)
+            m.id = i
+        self.len = len(materials)
+        self.state = VectorState(self.len+3, values=values)
 
-    # def find_price(self):
-
-
+    def find_price(self, material):
+        return self.state[0]*self.state[material.id+3]

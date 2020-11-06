@@ -13,6 +13,12 @@ class StateBase(object):
         self.state = state
         self.tag = tag
 
+    def __getitem__(self, item):
+        return self.state[item]
+
+    def __setitem__(self, key, value):
+        self.state[key] = value
+
     def __str__(self):
         return str(self.state.tolist())
 

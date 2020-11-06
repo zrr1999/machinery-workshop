@@ -12,11 +12,11 @@ class Material(object):
         self.price = price
 
     def update(self, market):
-        market.find_price(self.name)
+        market.find_price(self)
 
     def __str__(self):
         return f"{self.name}${self.price}"
 
 
-iron = Material(0, "Iron", price=5)  # 铁
-screw = Material(1, "Screw", price=5)  # 螺丝
+iron = Material(None, "Iron", price=5)  # 铁
+screw = Material(None, "Screw", price=15)  # 螺丝
