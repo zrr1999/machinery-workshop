@@ -20,15 +20,21 @@ class StateBase(object):
         return str(self.state.tolist())
 
 
-class MapState(StateBase):
+class MatrixState(StateBase):
 
-    def __init__(self, width=3, height=None, num_layers=1):
+    def __init__(self, width=3, height=None, num_layers=1, values=None):
+        s = np.zeros((num_layers, height, width))
         if height is None:
             height = width
-        super(MapState, self).__init__(np.zeros((num_layers, height, width), np.int), None)
+        if values is not None:
+            s[:] = values
+        super(MatrixState, self).__init__(np.zeros((num_layers, height, width), np.int), None)
 
 
-class PlayerState(StateBase):
+class VectorState(StateBase):
 
-    def __init__(self, n_state=1, tag=None):
-        super().__init__(np.zeros(n_state), tag)
+    def __init__(self, n_state=1, tag=None, values=None):
+        s = np.zeros(n_state)
+        if values is not None:
+            s[:] = values
+        super().__init__(s, tag)

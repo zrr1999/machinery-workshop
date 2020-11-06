@@ -11,6 +11,9 @@ class Material(object):
         self.name = name
         self.price = price
 
+    def update(self, market):
+        market.find_price(self.name)
+
     def __str__(self):
         return f"{self.name}${self.price}"
 

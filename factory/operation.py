@@ -60,7 +60,7 @@ class Buy(OperationBase):
         self.empty = empty
         self.target = target
 
-    def __call__(self, states, controller=None):
+    def __call__(self, states, controller=None, market=None):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
         if ps[self.coin] < self.price:
@@ -72,3 +72,15 @@ class Buy(OperationBase):
         else:
             ps[self.coin] -= self.price
             ms[self.pos] = self.goods
+
+
+class SetState(OperationBase):
+    NAME = "SetState"
+
+    def __init__(self, states, target=("ms", "ps")):
+        self.states = states
+        self.target = target
+
+    def __call__(self, states, controller=None):
+        for t in self.target:
+            states[t].state = states[t]
