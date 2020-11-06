@@ -63,7 +63,7 @@ class Buy(OperationBase):
     def __call__(self, states, controller=None, market=None):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
-        self.goods.update(self.market)
+        self.goods.update_price(self.market)
         if ps[self.coin] < self.goods.price:
             warnings.warn("货币不足，错误代码0x0011")
             return 0x0011

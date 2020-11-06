@@ -4,19 +4,18 @@
 # @Author : 詹荣瑞
 # @File : material.py
 # @desc : 本代码未经授权禁止商用
+from .market import Market
+
+
 class Material(object):
 
-    def __init__(self, material_id, name="Material", price=0):
+    def __init__(self, material_id: int = None, name: str = "Material", price: int = 0):
         self.id = material_id
         self.name = name
         self.price = price
 
-    def update(self, market):
-        market.find_price(self)
+    def update_price(self, market: Market):
+        self.price = market.find_price(self)
 
     def __str__(self):
         return f"{self.name}${self.price}"
-
-
-iron = Material(None, "Iron", price=5)  # 铁
-screw = Material(None, "Screw", price=15)  # 螺丝

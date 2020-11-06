@@ -5,6 +5,7 @@
 # @File : state.py
 # @desc : 本代码未经授权禁止商用
 import numpy as np
+from typing import List, Iterable
 
 
 class StateBase(object):
@@ -28,7 +29,7 @@ class StateBase(object):
 
 class MatrixState(StateBase):
 
-    def __init__(self, width=3, height=None, num_layers=1, values=None):
+    def __init__(self, width: int = 3, height: int = None, num_layers: int = 1, values=None):
         if height is None:
             height = width
         s = np.zeros((num_layers, height, width))
@@ -39,7 +40,7 @@ class MatrixState(StateBase):
 
 class VectorState(StateBase):
 
-    def __init__(self, n_state=1, tag=None, values=None):
+    def __init__(self, n_state: int = 1, tag=None, values=None):
         s = np.zeros(n_state)
         if values is not None:
             s[:] = values
