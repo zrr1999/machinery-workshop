@@ -29,9 +29,9 @@ class StateBase(object):
 class MatrixState(StateBase):
 
     def __init__(self, width=3, height=None, num_layers=1, values=None):
-        s = np.zeros((num_layers, height, width))
         if height is None:
             height = width
+        s = np.zeros((num_layers, height, width))
         if values is not None:
             s[:] = values
         super(MatrixState, self).__init__(np.zeros((num_layers, height, width), np.int), None)

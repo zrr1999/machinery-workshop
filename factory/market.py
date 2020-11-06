@@ -9,15 +9,15 @@ from .state import VectorState
 
 class Market(object):
 
-    def __init__(self, materials):
+    def __init__(self, *materials):
         values = [1, 1, 1]
         self.names = []
         for i, m in enumerate(materials):
             self.names.append(m.name)
             values.append(m.price)
-            m.id = i
+            m.id = i + 1
         self.len = len(materials)
-        self.state = VectorState(self.len+3, values=values)
+        self.state = VectorState(self.len + 3, values=values)
 
     def find_price(self, material):
-        return self.state[0]*self.state[material.id+3]
+        return self.state[0] * self.state[material.id + 2]

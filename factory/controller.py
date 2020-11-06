@@ -25,6 +25,7 @@ class Controller(object):
             op(states, self)
         for operation in self.parallel_sequence:
             operation(states, self)
+        return self
 
     def add_sequence(self, ps=None, ss=None):
         if ps:

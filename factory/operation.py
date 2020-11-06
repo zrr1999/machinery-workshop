@@ -51,9 +51,10 @@ class Move(OperationBase):
 class Buy(OperationBase):
     NAME = "Buy"
 
-    def __init__(self, goods, position, coin=0, empty=0, target=("ms", "ps")):
+    def __init__(self, goods, position, market, coin=0, empty=0, target=("ms", "ps")):
         self.goods = goods
         self.pos = position
+        self.market = market
         self.coin = coin
 
         self.empty = empty
@@ -62,7 +63,7 @@ class Buy(OperationBase):
     def __call__(self, states, controller=None, market=None):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
-        self.goods.update()
+        self.goods.update(self.market)
         if ps[self.coin] < self.goods.price:
             warnings.warn("货币不足，错误代码0x0011")
             return 0x0011
