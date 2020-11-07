@@ -5,6 +5,11 @@
 # @File : operation.py
 # @desc : 本代码未经授权禁止商用
 import warnings
+from typing import Iterable, Dict
+from .typing import Pos
+from .state import StateBase
+from .controller import Controller
+from .transaction import Material, Market
 
 
 class OperationBase(object):
@@ -16,42 +21,71 @@ class OperationBase(object):
     def __repr__(self):
         return self.NAME
 
-    def __call__(self, states, controller):
+    def __call__(self, states: Dict[str, StateBase], controller: Controller = None):
         raise NotImplementedError
 
 
-class Move(OperationBase):
-    NAME = "Move"
+class Catch(OperationBase):
+    NAME = "Catch"
 
-    def __init__(self, start, end, empty=0, target="ms"):
-        self.a = start
-        self.b = end
+    def __init__(self, position: Pos, empty: int = 0, target: str = "ms"):
+        self.pos = position
 
         self.empty = empty
         self.target = target
 
     def __call__(self, states, controller=None):
         state = states[self.target].state
-        if state[self.a] == self.empty:
-            warnings.warn("你正在试图移动一个空物体，错误代码0x0001")
+        if state[self.pos] == self.empty:
+            warnings.warn("你正在试图抬起一个空物体，错误代码0x0001")
             return 0x0001
-        elif state[self.b] != self.empty:
+        else:
+            obj = state[self.pos]
+            state[self.pos] = self.empty
+            return obj
+
+
+class Place(OperationBase):
+    NAME = "Place"
+
+    def __init__(self, position: Pos, empty: int = 0, obj: int = 0, target: str = "ms"):
+        self.pos = position
+
+        self.empty = empty
+        self.obj = obj
+        self.target = target
+
+    def __call__(self, states, controller=None):
+        state = states[self.target].state
+        if state[self.pos] != self.empty:
             warnings.warn("你正在将一个物体放置到非空位置，错误代码0x0002")
             return 0x0002
         else:
-            obj = state[self.a]
-            state[self.a] = self.empty
-            state[self.b] = obj
+            state[self.pos] = self.obj
             return 0
 
+
+class Move(OperationBase):
+    NAME = "Move"
+
+    def __init__(self, start: Pos, end: Pos, empty: int = 0, target: str = "ms"):
+        self.catch = Catch(start, empty, target)
+        self.place = Place(end, empty, empty, target)
+
+        self.target = target
+
+    def __call__(self, states, controller=None):
+        self.place.obj = self.catch(states)
+        return self.place(states)
+
     def __repr__(self):
-        return f"{self.NAME}({self.a}->{self.b})"
+        return f"{self.NAME}({self.catch.pos}->{self.place.pos})"
 
 
 class Buy(OperationBase):
     NAME = "Buy"
 
-    def __init__(self, goods, position, market, coin=0, empty=0, target=("ms", "ps")):
+    def __init__(self, goods: Material, position: Pos, market: Market, coin=0, empty=0, target=("ms", "ps")):
         self.goods = goods
         self.pos = position
         self.market = market
@@ -60,10 +94,10 @@ class Buy(OperationBase):
         self.empty = empty
         self.target = target
 
-    def __call__(self, states, controller=None, market=None):
+    def __call__(self, states, controller=None):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
-        self.goods.update_price(self.market)
+        self.market.update_price(self.goods)
         if ps[self.coin] < self.goods.price:
             warnings.warn("货币不足，错误代码0x0011")
             return 0x0011
@@ -73,12 +107,13 @@ class Buy(OperationBase):
         else:
             ps[self.coin] -= self.goods.price
             ms[self.pos] = self.goods.id
+            return 0
 
 
 class SetState(OperationBase):
     NAME = "SetState"
 
-    def __init__(self, states, target=("ms", "ps")):
+    def __init__(self, states: Dict[str, StateBase], target: Iterable[str] = ("ms", "ps")):
         self.states = states
         self.target = target
 

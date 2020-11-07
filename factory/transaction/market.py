@@ -4,7 +4,7 @@
 # @Author : 詹荣瑞
 # @File : market.py
 # @desc : 本代码未经授权禁止商用
-from .state import VectorState
+from factory.state import VectorState
 from .material import Material
 
 
@@ -12,6 +12,7 @@ class Market(object):
 
     def __init__(self, *materials: Material):
         values = [1, 1, 1]
+        self.materials = list(materials)
         self.names = []
         for i, m in enumerate(materials):
             self.names.append(m.name)
@@ -20,5 +21,5 @@ class Market(object):
         self.len = len(materials)
         self.state = VectorState(self.len + 3, values=values)
 
-    def find_price(self, material: Material):
-        return self.state[0] * self.state[material.id + 2]
+    def update_price(self, material: Material):
+        self.materials[material.id].price = self.state[0] * self.state[material.id + 2]

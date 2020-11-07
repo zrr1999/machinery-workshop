@@ -5,7 +5,6 @@
 # @File : state.py
 # @desc : 本代码未经授权禁止商用
 import numpy as np
-from typing import List, Iterable
 
 
 class StateBase(object):

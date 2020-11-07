@@ -5,6 +5,7 @@
 # @File : controller.py
 # @desc : 本代码未经授权禁止商用
 from collections.abc import Iterable
+from typing import Optional
 
 
 class Controller(object):
@@ -17,7 +18,7 @@ class Controller(object):
         return (f"Parallel Sequence: {str(self.parallel_sequence)}\n"
                 f"Serial Sequence: \n{str(self.serial_sequence)}")
 
-    def step(self, states):
+    def step(self, states: Optional[Iterable]):
         if not isinstance(states, Iterable):
             states = [states]
         if self.serial_sequence:
@@ -33,13 +34,3 @@ class Controller(object):
         if ss:
             self.serial_sequence += ss
         return self
-
-
-if __name__ == '__main__':
-    from factory.state import MapState
-    from factory.operation import Move
-    states = {
-        "ms": MapState(),
-    }
-    m12 = Move((0, 1, 1), (0, 2, 1))
-    m21 = Move((0, 2, 1), (0, 1, 1))
