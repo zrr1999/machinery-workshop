@@ -5,15 +5,45 @@
 # @File : main.py
 # @desc : 本代码未经授权禁止商用
 from factory import World
-
-world = World()
-
-# c = Controller().add_sequence(ss=[init]).step(s)
+import bonegame
 
 
-for i in range(4):
-    print(f"第{i + 1}次循环")
-    print(world.state)
-    world.buy(0, (0, 0, 0))
-    print(world.state)
-    world.move(i+1)
+class DemoGame(bonegame.GoBang):
+    obj = 0
+
+    def key_event(self, key, action, modifiers):
+        if action == "ACTION_PRESS":
+            if key == ord('q'):
+                self.camera.yaw += 1
+            elif key == ord('e'):
+                self.camera.yaw -= 1
+            elif key == ord('x'):
+                self.camera.pitch -= 5
+            elif key == ord('w'):
+                self.select_pos[1] += 1
+            elif key == ord('a'):
+                self.select_pos[0] -= 1
+            elif key == ord('s'):
+                self.select_pos[1] -= 1
+            elif key == ord('d'):
+                self.select_pos[0] += 1
+            elif key == ord(' '):
+                pos = (0, self.board.w // 2 - self.select_pos[1],
+                       -self.board.h // 2 + self.select_pos[0])
+                if self.round % 2 == 0:
+                    self.obj = world.catch(pos)
+                else:
+                    world.place(pos, self.obj)
+                    world.buy(0, (0, 2, 2))
+                self.round += 1
+
+
+SIZE = (7, 7)
+
+world = World(SIZE)
+game = DemoGame(SIZE)
+
+world.buy(0, (0, 2, 2))
+while True:
+    game.board.map = world.state['ms'][0]
+    game.render()

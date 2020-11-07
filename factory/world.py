@@ -5,11 +5,10 @@
 # @File : world.py
 # @desc : 本代码未经授权禁止商用
 from typing import Tuple, Union
-from .typing import Pos
+from factory.utils.typing import Pos
 from .state import MatrixState, VectorState
-from .operation import Move, Buy
+from .operation import Move, Buy, Catch, Place
 from .transaction import Material, Market
-
 
 iron = Material(name="Iron", price=5)  # 铁
 screw = Material(name="Screw", price=15)  # 螺丝
@@ -41,6 +40,10 @@ class World(object):
         buy.pos = position
         return buy(self.state)
 
-    def move(self, a):
-        move = Move((0, 0, 0), (0, 0, a))
-        return move(self.state)
+    def catch(self, position: Pos):
+        op = Catch(position)
+        return op(self.state)
+
+    def place(self, position: Pos, obj: int):
+        op = Place(position, obj=obj)
+        return op(self.state)

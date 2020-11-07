@@ -6,7 +6,7 @@
 # @desc : 本代码未经授权禁止商用
 import warnings
 from typing import Iterable, Dict
-from .typing import Pos
+from .utils.typing import Pos
 from .state import StateBase
 from .controller import Controller
 from .transaction import Material, Market
@@ -48,7 +48,7 @@ class Catch(OperationBase):
 class Place(OperationBase):
     NAME = "Place"
 
-    def __init__(self, position: Pos, empty: int = 0, obj: int = 0, target: str = "ms"):
+    def __init__(self, position: Pos, obj: int = 0, empty: int = 0, target: str = "ms"):
         self.pos = position
 
         self.empty = empty
