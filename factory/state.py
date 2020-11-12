@@ -28,10 +28,10 @@ class StateBase(object):
 
 class MatrixState(StateBase):
 
-    def __init__(self, width: int = 3, height: int = None, num_layers: int = 1, values=None):
+    def __init__(self, width: int = 3, height: int = None, num_layers: int = 1, values=None, dtype=None):
         if height is None:
             height = width
-        s = np.zeros((num_layers, height, width))
+        s = np.zeros((num_layers, height, width), dtype)
         if values is not None:
             s[:] = values
         super(MatrixState, self).__init__(np.zeros((num_layers, height, width), np.int), None)
@@ -39,8 +39,8 @@ class MatrixState(StateBase):
 
 class VectorState(StateBase):
 
-    def __init__(self, n_state: int = 1, tag=None, values=None):
-        s = np.zeros(n_state)
+    def __init__(self, n_state: int = 1, tag=None, values=None, dtype=None):
+        s = np.zeros(n_state, dtype)
         if values is not None:
             s[:] = values
         super().__init__(s, tag)

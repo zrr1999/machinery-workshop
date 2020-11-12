@@ -110,6 +110,31 @@ class Buy(OperationBase):
             return 0
 
 
+class Sell(OperationBase):
+    NAME = "Sell"
+
+    def __init__(self, position: Pos, market: Market, coin=0, empty=0, target=("map", "player", "market")):
+        self.pos = position
+        self.market = market
+        self.coin = coin
+
+        self.empty = empty
+        self.target = target
+
+    def __call__(self, states, controller=None):
+        ms = states[self.target[0]].state
+        ps = states[self.target[1]].state
+        goods = self.market[ms[self.pos]]
+        self.market.update_price(goods)
+        if ms[self.pos] == self.empty:
+            warnings.warn("目标位置无物品，无法出售，错误代码0x0003")
+            return 0x0003
+        else:
+            ps[self.coin] += goods.price
+            ms[self.pos] = self.empty
+            return 0
+
+
 class SetState(OperationBase):
     NAME = "SetState"
 
