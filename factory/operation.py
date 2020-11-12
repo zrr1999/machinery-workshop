@@ -21,20 +21,20 @@ class OperationBase(object):
     def __repr__(self):
         return self.NAME
 
-    def __call__(self, states: Dict[str, StateBase], controller: Controller = None):
+    def __call__(self, states: Dict[str, StateBase], controller: Controller = None, **kwargs):
         raise NotImplementedError
 
 
 class Catch(OperationBase):
     NAME = "Catch"
 
-    def __init__(self, position: Pos, empty: int = 0, target: str = "ms"):
+    def __init__(self, position: Pos, empty: int = 0, target: str = "map"):
         self.pos = position
 
         self.empty = empty
         self.target = target
 
-    def __call__(self, states, controller=None):
+    def __call__(self, states, controller=None, **kwargs):
         state = states[self.target].state
         if state[self.pos] == self.empty:
             warnings.warn("你正在试图抬起一个空物体，错误代码0x0001")
@@ -48,14 +48,14 @@ class Catch(OperationBase):
 class Place(OperationBase):
     NAME = "Place"
 
-    def __init__(self, position: Pos, obj: int = 0, empty: int = 0, target: str = "ms"):
+    def __init__(self, position: Pos, obj: int = 0, empty: int = 0, target: str = "map"):
         self.pos = position
 
         self.empty = empty
         self.obj = obj
         self.target = target
 
-    def __call__(self, states, controller=None):
+    def __call__(self, states, controller=None, **kwargs):
         state = states[self.target].state
         if state[self.pos] != self.empty:
             warnings.warn("你正在将一个物体放置到非空位置，错误代码0x0002")
@@ -68,13 +68,13 @@ class Place(OperationBase):
 class Move(OperationBase):
     NAME = "Move"
 
-    def __init__(self, start: Pos, end: Pos, empty: int = 0, target: str = "ms"):
+    def __init__(self, start: Pos, end: Pos, empty: int = 0, target: str = "map"):
         self.catch = Catch(start, empty, target)
         self.place = Place(end, empty, empty, target)
 
         self.target = target
 
-    def __call__(self, states, controller=None):
+    def __call__(self, states, controller=None, **kwargs):
         self.place.obj = self.catch(states)
         return self.place(states)
 
@@ -85,7 +85,8 @@ class Move(OperationBase):
 class Buy(OperationBase):
     NAME = "Buy"
 
-    def __init__(self, goods: Material, position: Pos, market: Market, coin=0, empty=0, target=("ms", "ps")):
+    def __init__(self, goods: Material, position: Pos, market: Market,
+                 coin=0, empty=0, target=("map", "player")):
         self.goods = goods
         self.pos = position
         self.market = market
@@ -94,7 +95,7 @@ class Buy(OperationBase):
         self.empty = empty
         self.target = target
 
-    def __call__(self, states, controller=None):
+    def __call__(self, states, controller=None, **kwargs):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
         self.market.update_price(self.goods)
@@ -121,7 +122,7 @@ class Sell(OperationBase):
         self.empty = empty
         self.target = target
 
-    def __call__(self, states, controller=None):
+    def __call__(self, states, controller=None, **kwargs):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
         goods = self.market[ms[self.pos]]
@@ -142,6 +143,6 @@ class SetState(OperationBase):
         self.states = states
         self.target = target
 
-    def __call__(self, states, controller=None):
+    def __call__(self, states, controller=None, **kwargs):
         for t in self.target:
             states[t].state = states[t]
