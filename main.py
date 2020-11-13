@@ -45,5 +45,5 @@ game = DemoGame(SIZE)
 
 world.buy(0, (0, 2, 2))
 while True:
-    game.board.map = world.state['ms'][0]
+    game.board.map = world.states['map'][0]
     game.render()
