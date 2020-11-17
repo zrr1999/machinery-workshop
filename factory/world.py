@@ -8,11 +8,13 @@ from typing import Tuple, Union
 from .utils.typing import Pos
 from .state import MatrixState, VectorState
 from .operation import Buy, Catch, Place, Sell
-from .transaction import Material, Market
+from .transaction import Market
+from .material import Material
 
 iron = Material(name="iron", price=5)  # 铁
 screw = Material(name="screw", price=15)  # 螺丝
-materials = [iron, screw]
+processor = Material(name="processor", price=20)  # 加工器
+materials = [iron, screw, processor]
 
 
 class World(object):

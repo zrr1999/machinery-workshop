@@ -9,7 +9,8 @@ from typing import Iterable, Dict
 from .utils.typing import Pos
 from .state import StateBase
 from .controller import Controller
-from .transaction import Material, Market
+from .transaction import Market
+from .material import Material
 
 
 class OperationBase(object):
