@@ -4,8 +4,8 @@
 # @Author : 詹荣瑞
 # @File : market.py
 # @desc : 本代码未经授权禁止商用
-from factory.state import VectorState
-from factory.material import Material
+from factory.core.state import VectorState
+from factory.commodity.material import Material
 
 
 class Market(object):

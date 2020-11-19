@@ -6,10 +6,10 @@
 # @desc : 本代码未经授权禁止商用
 from typing import Tuple, Union
 from .utils.typing import Pos
-from .state import MatrixState, VectorState
+from factory.core.state import MatrixState, VectorState
 from .operation import Buy, Catch, Place, Sell
 from .transaction import Market
-from .material import Material
+from factory.commodity.material import Material
 
 iron = Material(name="iron", price=5)  # 铁
 screw = Material(name="screw", price=15)  # 螺丝

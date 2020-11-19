@@ -7,10 +7,10 @@
 import warnings
 from typing import Iterable, Dict
 from .utils.typing import Pos
-from .state import StateBase
+from factory.core.state import StateBase
 from .controller import Controller
 from .transaction import Market
-from .material import Material
+from factory.commodity.material import Material
 
 
 class OperationBase(object):
