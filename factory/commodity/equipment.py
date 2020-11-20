@@ -8,6 +8,7 @@ from . import Commodity
 
 
 class Equipment(Commodity):
+    type = 1
 
     def __init__(self, name: str = "Material", price: int = 0, size=(2, 2)):
         super().__init__(name=name, price=price)

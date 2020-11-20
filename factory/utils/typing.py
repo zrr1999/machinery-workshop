@@ -4,5 +4,7 @@
 # @Author : 詹荣瑞
 # @File : typing.py
 # @desc : 本代码未经授权禁止商用
-from typing import Tuple, TypeVar
+from typing import Tuple, TypeVar, NewType
+Size = TypeVar("Size", Tuple[int, int], int)
 Pos = TypeVar("Pos", Tuple, int)
+Id = NewType('Id', int)

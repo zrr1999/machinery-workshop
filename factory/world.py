@@ -5,7 +5,7 @@
 # @File : world.py
 # @desc : 本代码未经授权禁止商用
 from typing import Tuple, Union
-from .utils.typing import Pos
+from .utils.typing import Pos, Size
 from factory.core.state import MatrixState, VectorState
 from .operation import Buy, Catch, Place, Sell
 from .transaction import Market
@@ -19,10 +19,10 @@ materials = [iron, screw, processor]
 
 class World(object):
 
-    def __init__(self, size: Tuple[int, int] = (5, 5), initial=100):
+    def __init__(self, size: Size = 5, initial=100):
         self.market = Market(*materials)
         self.states = {
-            "map": MatrixState(*size, 3),  # Map state
+            "map": MatrixState(size, 3),  # Map state
             "player": VectorState(3),  # Player state
             "market": self.market.state  # Market state
         }

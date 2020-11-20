@@ -4,6 +4,7 @@
 # @Author : 詹荣瑞
 # @File : state.py
 # @desc : 本代码未经授权禁止商用
+from factory.utils.typing import Size
 import numpy as np
 
 
@@ -28,9 +29,11 @@ class StateBase(object):
 
 class MatrixState(StateBase):
 
-    def __init__(self, width: int = 3, height: int = None, num_layers: int = 1, values=None, dtype=None):
-        if height is None:
-            height = width
+    def __init__(self, size: Size = 3, num_layers: int = 1, values=None, dtype=None):
+        if isinstance(size, int):
+            height = width = size
+        else:
+            height, width = size
         s = np.zeros((num_layers, height, width), dtype)
         if values is not None:
             s[:] = values

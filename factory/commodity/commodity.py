@@ -5,6 +5,7 @@
 # @File : commodity.py
 # @desc : 本代码未经授权禁止商用
 class Commodity(object):
+    type = 0
 
     def __init__(self, identity: int = None, name: str = "Material", price: int = 0):
         self.id = identity

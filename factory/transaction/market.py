@@ -4,6 +4,7 @@
 # @Author : 詹荣瑞
 # @File : market.py
 # @desc : 本代码未经授权禁止商用
+from factory.utils.typing import Id
 from factory.core.state import VectorState
 from factory.commodity.material import Material
 
@@ -11,18 +12,23 @@ from factory.commodity.material import Material
 class Market(object):
 
     def __init__(self, *materials: Material):
-        values = [1, 1, 1]
+        self.state = VectorState(3, values=[1, 1, 1])  # 通货膨胀、、
         self.materials = list(materials)
-        self.names = []
+        names = []
+        prices = []
         for i, m in enumerate(materials):
-            self.names.append(m.name)
-            values.append(m.price)
             m.id = i + 1
-        self.len = len(materials)
-        self.state = VectorState(self.len + 3, values=values)
+            names.append(m.name)
+            prices.append(m.price)
+        self.names = names
+        self.price = VectorState(len(self), values=prices)
 
-    def __getitem__(self, item):
-        return self.materials[item]
+    def __len__(self):
+        return len(self.materials)
 
-    def update_price(self, material: Material):
-        self.materials[material.id-1].price = self.state[0] * self.state[material.id + 2]
+    def __getitem__(self, id: Id):
+        return self.materials[id - 1]
+
+    def update_price(self, id: Id):
+        i = id - 1
+        self.materials[i].price = self.state[0] * self.state[i]
