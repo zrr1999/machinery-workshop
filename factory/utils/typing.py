@@ -7,4 +7,4 @@
 from typing import Tuple, TypeVar, NewType
 Size = TypeVar("Size", Tuple[int, int], int)
 Pos = TypeVar("Pos", Tuple, int)
-Id = NewType('Id', int)
+ObjId = NewType('ObjId', int)
