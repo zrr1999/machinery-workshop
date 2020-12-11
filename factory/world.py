@@ -4,12 +4,13 @@
 # @Author : 詹荣瑞
 # @File : world.py
 # @desc : 本代码未经授权禁止商用
+import re
 from typing import Tuple, Union
-from .utils.typing import Pos, Size
 from factory.core.state import MatrixState, VectorState
+from factory.commodity.material import Material
+from .utils.typing import Pos, Size
 from .operation import Buy, Catch, Place, Sell
 from .transaction import Market
-from factory.commodity.material import Material
 
 iron = Material(name="iron", price=5)  # 铁
 screw = Material(name="screw", price=15)  # 螺丝
@@ -54,3 +55,10 @@ class World(object):
     def place(self, position: Pos, obj: int):
         op = Place(position, obj=obj)
         return op(self.states)
+
+    def analyze(self, string):
+        # mov: [[0, 1, 1], [0, 2, 1]]
+        pattern = re.compile(r"([A-z]+): *(.*)")
+        mov_pattern = re.compile(r"([A-z]+): *(.*)")
+
+        return pattern.search(string).groups()

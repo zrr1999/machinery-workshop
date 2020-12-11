@@ -4,20 +4,11 @@
 # @Author : 詹荣瑞
 # @File : test.py
 # @desc : 本代码未经授权禁止商用
-import pyglet
-from pyglet.window import Window
-from pyglet.shapes import Circle
-from pyglet.sprite import Sprite
-window = Window(600, 400)
-c = Circle(25, 25, 20)
+import re
+pattern = re.compile(r"([A-z]+): *(.*)")
+mov_pattern = re.compile(r"([A-z]+): *(.*)")
 
-
-@window.event
-def on_draw():
-    window.clear()
-
-    c.draw()
-
-
-pyglet.app.run()
+op, arg = pattern.search("mov:[[0,1,1],[0,2,1]]").groups()
+print(op, eval(arg))
+print(pattern.search("mov: [02 1 1], [0 2 1]").groups())
 
