@@ -24,12 +24,25 @@ class StateBase(object):
         return str(self.state.tolist())
 
     def __repr__(self):
-        return str(self.state.tolist())
+        return str(self)
 
 
 class MatrixState(StateBase):
+    """
+    矩阵状态是一个状态类，具有状态和标签两个属性，
+    状态是一个尺寸为 n * h * w 的张量，
+    其中 n 为层数，分别为状态的高度和宽度。
+    """
 
-    def __init__(self, size: Size = 3, num_layers: int = 1, values=None, dtype=None):
+    def __init__(self, size: Size = 3, num_layers: int = 1, values=None, dtype=np.int, tag=None):
+        """
+
+        :param size: 状态的尺寸，即 (h, w)
+        :param num_layers: 状态的层数，即 n
+        :param values: 状态初始值
+        :param dtype: 状态数据类型
+        :param tag: 暂时仅作标注
+        """
         if isinstance(size, int):
             height = width = size
         else:
@@ -37,13 +50,29 @@ class MatrixState(StateBase):
         s = np.zeros((num_layers, height, width), dtype)
         if values is not None:
             s[:] = values
-        super(MatrixState, self).__init__(np.zeros((num_layers, height, width), np.int), None)
+        super(MatrixState, self).__init__(np.zeros((num_layers, height, width), dtype), None)
 
 
 class VectorState(StateBase):
 
-    def __init__(self, n_state: int = 1, tag=None, values=None, dtype=None):
+    def __init__(self, n_state: int = 1, values=None, dtype=None, tag: list = None):
+        """
+
+        :param n_state: 状态个数
+        :param values: 状态初始值
+        :param dtype: 状态数据类型
+        :param tag: 仅作标注
+        """
         s = np.zeros(n_state, dtype)
         if values is not None:
             s[:] = values
         super().__init__(s, tag)
+
+    def __str__(self):
+        if self.tag is None:
+            self.tag = []
+        self.tag += ["undefined"]*(len(self.state) - len(self.tag))
+        out = "["
+        out += ", ".join(f"{t}({s})" for s, t in zip(self.state, self.tag))
+        out += "]"
+        return out

@@ -52,9 +52,10 @@ class World(object):
         op = Catch(position)
         return op(self.states)
 
-    def place(self, position: Pos, obj: int):
-        op = Place(position, obj=obj)
-        return op(self.states)
+    def place(self, position: Pos, obj: int = None):
+        if obj is not None:
+            op = Place(position, obj=obj)
+            return op(self.states)
 
     def analyze(self, string):
         # mov: [[0, 1, 1], [0, 2, 1]]

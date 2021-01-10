@@ -35,12 +35,14 @@ class DemoGame(bonegame.GoBang):
                 else:
                     world.place(pos, self.obj)
                     world.buy(0, (0, 2, 2))
+                    self.obj = None
                 self.round += 1
 
 
 SIZE = (7, 7)
 
 world = World(SIZE)
+print(world.states["player"])
 game = DemoGame(SIZE)
 
 world.buy(0, (0, 2, 2))

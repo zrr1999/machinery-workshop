@@ -38,8 +38,7 @@ class Catch(OperationBase):
     def __call__(self, states, controller=None, **kwargs):
         state = states[self.target].state
         if state[self.pos] == self.empty:
-            warnings.warn("你正在试图抬起一个空物体，错误代码0x0001")
-            return 0x0001
+            warnings.warn("你正在试图抬起一个空物体")
         else:
             obj = state[self.pos]
             state[self.pos] = self.empty
@@ -59,8 +58,7 @@ class Place(OperationBase):
     def __call__(self, states, controller=None, **kwargs):
         state = states[self.target].state
         if state[self.pos] != self.empty:
-            warnings.warn("你正在将一个物体放置到非空位置，错误代码0x0002")
-            return 0x0002
+            warnings.warn("你正在将一个物体放置到非空位置")
         else:
             state[self.pos] = self.obj
             return 0
@@ -99,12 +97,11 @@ class Buy(OperationBase):
     def __call__(self, states, controller=None, **kwargs):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
-        self.market.update_price(self.goods)
         if ps[self.coin] < self.goods.price:
-            warnings.warn("货币不足，错误代码0x0011")
+            warnings.warn("货币不足")
             return 0x0011
         elif ms[self.pos] != self.empty:
-            warnings.warn("你正在将一个物体放置到非空位置，错误代码0x0002")
+            warnings.warn("你正在将一个物体放置到非空位置")
             return 0x0002
         else:
             ps[self.coin] -= self.goods.price
@@ -127,9 +124,8 @@ class Sell(OperationBase):
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
         goods = self.market[ms[self.pos]]
-        self.market.update_price(goods)
         if ms[self.pos] == self.empty:
-            warnings.warn("目标位置无物品，无法出售，错误代码0x0003")
+            warnings.warn("目标位置无物品，无法出售")
             return 0x0003
         else:
             ps[self.coin] += goods.price
