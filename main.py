@@ -41,7 +41,7 @@ class DemoGame(bonegame.GoBang):
 
 SIZE = (7, 7)
 
-world = World(SIZE)
+world = World(SIZE, path="./compile_test")
 print(world.states["player"])
 game = DemoGame(SIZE)
 

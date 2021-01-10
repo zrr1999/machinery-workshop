@@ -6,11 +6,11 @@
 # @desc : 本代码未经授权禁止商用
 import warnings
 from typing import Iterable, Dict
-from .utils.typing import Pos
 from factory.core.state import StateBase
+from factory.commodity.material import Material
+from .utils.typing import Pos
 from .controller import Controller
 from .transaction import Market
-from factory.commodity.material import Material
 
 
 class OperationBase(object):
@@ -112,7 +112,8 @@ class Buy(OperationBase):
 class Sell(OperationBase):
     NAME = "Sell"
 
-    def __init__(self, position: Pos, market: Market, coin=0, empty=0, target=("map", "player", "market")):
+    def __init__(self, position: Pos, market: Market,
+                 coin=0, empty=0, target=("map", "player", "market")):
         self.pos = position
         self.market = market
         self.coin = coin
@@ -136,7 +137,7 @@ class Sell(OperationBase):
 class SetState(OperationBase):
     NAME = "SetState"
 
-    def __init__(self, states: Dict[str, StateBase], target: Iterable[str] = ("ms", "ps")):
+    def __init__(self, states: Dict[str, StateBase], target: Iterable[str] = ("player", )):
         self.states = states
         self.target = target
 
