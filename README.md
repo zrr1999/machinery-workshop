@@ -1,25 +1,27 @@
 # 机械工坊后端逻辑功能框架
 
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)![Upload Python Package](https://github.com/zrr1999/PyTex/workflows/Upload%20Python%20Package/badge.svg)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+![Upload Python Package](https://github.com/zrr1999/PyTex/workflows/Upload%20Python%20Package/badge.svg)
 
 机械工坊是一个好游戏。
 
-## 背景
+## 游戏背景
+经过四年的艰苦学习，你终于从大学毕业了，本应顺利继承父母万贯家财，但却被告知父母已经带着所有钱财去了国外居住，
+唯一留给你的只有一座小到不能再小的简易工坊以及少量的金币，而且这座工坊目前只能用于制作最基础的机械工件，
+如工业用锤头和锤柄。
 
-...
+现在你需要运用工件制造技术来制造工件并出售，从而赚取更多的金币生存下去。在你的努力之下小工坊逐渐扩大，
+可以制造的工件也从最开始的锤子发展到可以组装电脑甚至生产芯片。
 
-## 优势
-- LaTex
-    1. 本辅助库可以有效避免拼写错误，漏加空格等低级错误。
-    2. 本辅助库可以借助Python提供更多的功能。
-    3. 本辅助库在插入图片、生成表格等方面有巨大优势。
+## 框架特色
+
 
 
 ## 安装[![Downloads](https://pepy.tech/badge/bone-pytex)](https://pepy.tech/project/bone-pytex)
 
 这个项目使用 [Python](https://www.python.org/downloads/) 开发，请确保你本地安装了它。
 
-建议使用pip安装本库。
+建议使用pip安装本项目。
 
 ```sh
 $ pip install .
@@ -34,18 +36,12 @@ $ pip install .
 ```
 
 
-
-## 示例
-
-
-
-## 特色功能
-1. 
-
 ## 计划实现功能
 1. 
 
 ## 更新日志
+- (2020.1.10)  常规更新
+    - 增加了基础的解析功能（玩家自定义的基础）。
 - (2020.11.21)  常规更新
     - 调整了整体框架结构。
     - 优化了Map类和Market类的实现。
@@ -77,5 +73,5 @@ $ pip install .
 
 ## 使用许可
 
-禁止将本辅助库及使用本辅助库制作的文档上传到百度网盘。
+禁止将本项目及相关内容上传到百度网盘。
 [GNU](LICENSE) © Rongrui Zhan

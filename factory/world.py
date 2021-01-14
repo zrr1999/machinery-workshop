@@ -6,8 +6,8 @@
 # @desc : 本代码未经授权禁止商用
 import re
 from typing import Tuple, Union
-from factory.core.state import MatrixState, VectorState
-from factory.commodity.material import Material
+from factory.core import MatrixState, VectorState
+from factory.commodity import Commodity, Material
 from factory.compiler import Compiler
 from .utils.typing import Pos, Size
 from .operation import Buy, Catch, Place, Sell
@@ -28,7 +28,7 @@ class World(object):
         :param coin: path为None时有效
         :param path: 读取文件路径
         """
-        self.materials = []
+        self.commodities = []
         self.market = Market()
         self.states = {}
         self.buy_ops = {}
@@ -44,26 +44,32 @@ class World(object):
         if path is not None:
             self.compiler(path)
         world_dict = self.compiler.world_dict
-        self.materials = [Material(name=c[0], price=c[1]) for c in world_dict["commodity"]]
-        self.market = Market(*self.materials)
+        self.commodities = []
+        for c in world_dict["commodity"]:
+            if c[2] == "material":
+                c_obj = Material(name=c[0], price=c[1])
+            else:
+                c_obj = Material(name=c[0], price=c[1])
+            self.commodities.append(c_obj)
+        self.market = Market(*self.commodities)
         self.states = {
             "map": MatrixState(world_dict["size"], world_dict["num"]),  # Map state
             "player": VectorState(3, tag=["coin", "level", "undefined"]),  # Player state
             "market": self.market.state  # Market state
         }
         self.states["player"][0] = world_dict["coin"]
-        self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.materials}
+        self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.commodities}
 
     def step(self):
         return self.states
 
-    def buy(self, material: Union[Material, str, int], position: Pos):
-        if isinstance(material, str):
-            buy = self.buy_ops.get(material)
-        elif isinstance(material, int):
-            buy = Buy(self.materials[material], (), self.market)
+    def buy(self, commodity: Union[Commodity, str, int], position: Pos):
+        if isinstance(commodity, str):
+            buy = self.buy_ops.get(commodity)
+        elif isinstance(commodity, int):
+            buy = Buy(self.commodities[commodity], (), self.market)
         else:
-            buy = Buy(material, (), self.market)
+            buy = Buy(commodity, (), self.market)
         buy.pos = position
         return buy(self.states)
 

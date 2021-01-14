@@ -13,21 +13,25 @@ from factory.transaction import Market
 
 
 class Compiler(object):
+    """
+    完成 material，
+    """
 
     def __init__(self):
         self.world_dict = {
             "size": (5, 5),
-            "num": 3,
-            "coin": 100,
+            "layer_num": 3,
+            "player_state": ["coin", "level"],
+            "player_state_value": [100, 0],
 
             "commodity": [
-                ("iron", 5),
-                ("screw", 15),
-                ("processor", 20)
+                ("iron", 5, "material"),
+                ("screw", 15, "material"),
+                ("processor", 20, "material")
             ],
         }
 
-    def __call__(self, path):
+    def __call__(self, path: str):
         region = re.compile(r"% *(.+)")
         command = re.compile(r"(.+): *(.+)")
         self.world_dict["commodity"] = []
@@ -44,25 +48,6 @@ class Compiler(object):
     def compile_line(self, current, command, args):
         if command == "material":
             name, price = args.split(" ")
-            self.world_dict["commodity"].append((name, int(price)))
-
-
-if __name__ == '__main__':
-    player = Compiler()
-
-    region = re.compile(r"% *(.+)")
-    command = re.compile(r"(.+): *(.+)")
-
-    current = None
-    with open("../../compile_test", 'r', encoding="utf-8") as f:
-        for line in f.readlines():
-            res = region.search(line)
-            if res is None:
-                res = command.search(line)
-                current(*res.groups())
-            else:
-                current = eval(res.group(1))
-
-
-
-
+            self.world_dict["commodity"].append((name, int(price), "material"))
+        elif command == "size":
+            self.world_dict["size"] = eval(args)
