@@ -1,0 +1,15 @@
+% commodity
+material: iron 5
+material: screw 15
+material: processor 20
+
+% market
+
+% player
+vec: 金币数 等级
+initial: 100 0
+
+% map
+size: (9,9)
+iron: (0,1) (2,2)
+iron: (3,3)

@@ -13,11 +13,11 @@ class DemoGame(bonegame.GoBang):
 
     def key_event(self, key, action, modifiers):
         if action == "ACTION_PRESS":
-            if key == ord('q'):
+            if key == ord(','):
                 self.camera.yaw += 1
-            elif key == ord('e'):
+            elif key == ord('.'):
                 self.camera.yaw -= 1
-            elif key == ord('x'):
+            elif key == ord('['):
                 self.camera.pitch -= 5
             elif key == ord('w'):
                 self.select_pos[1] += 1
@@ -39,13 +39,14 @@ class DemoGame(bonegame.GoBang):
                 self.round += 1
 
 
-SIZE = (7, 7)
+SIZE = (9, 9)
 
-world = World(SIZE, path="./compile_test")
+world = World(path="./compile_test")
 print(world.states["player"])
 game = DemoGame(SIZE)
 
 world.buy(0, (0, 2, 2))
+print(world.states['map'][0])
 while True:
     game.board.map = world.states['map'][0]
     game.render()

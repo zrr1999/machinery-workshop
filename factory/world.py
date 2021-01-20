@@ -34,7 +34,7 @@ class World(object):
         self.buy_ops = {}
         self.compiler = Compiler()
         world_dict = self.compiler.world_dict
-        world_dict["coin"] = coin
+        world_dict["player_state_value"][0] = coin
         world_dict["size"] = size
         self.load_dict(path)
 
@@ -51,13 +51,14 @@ class World(object):
             else:
                 c_obj = Material(name=c[0], price=c[1])
             self.commodities.append(c_obj)
+        size, num = world_dict["size"], world_dict["layer_num"]
+        state, value = world_dict["player_state"], world_dict["player_state_value"]
         self.market = Market(*self.commodities)
         self.states = {
-            "map": MatrixState(world_dict["size"], world_dict["num"]),  # Map state
-            "player": VectorState(3, tag=["coin", "level", "undefined"]),  # Player state
+            "map": MatrixState(size, num),  # Map state
+            "player": VectorState(len(state), values=value, tag=state),  # Player state
             "market": self.market.state  # Market state
         }
-        self.states["player"][0] = world_dict["coin"]
         self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.commodities}
 
     def step(self):

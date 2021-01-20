@@ -5,6 +5,7 @@
 # @File : compiler.py
 # @desc : 本代码未经授权禁止商用
 import re
+from typing import List, Tuple
 from factory.core.state import MatrixState, VectorState
 from factory.commodity.material import Material
 from factory.utils.typing import Pos, Size
@@ -51,3 +52,9 @@ class Compiler(object):
             self.world_dict["commodity"].append((name, int(price), "material"))
         elif command == "size":
             self.world_dict["size"] = eval(args)
+        elif command == "vec":
+            if current == "player":
+                self.world_dict["player_state"] = args.split(" ")
+        elif command == "initial":
+            if current == "player":
+                self.world_dict["player_state_value"] = args.split(" ")
