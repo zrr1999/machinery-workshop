@@ -27,6 +27,14 @@ class DemoGame(bonegame.GoBang):
                 self.select_pos[1] -= 1
             elif key == ord('d'):
                 self.select_pos[0] += 1
+            elif key == ord('b'):
+                pos = (0, self.board.w // 2 - self.select_pos[1],
+                       -self.board.h // 2 + self.select_pos[0])
+                world.buy(0, pos)
+            elif key == ord('q'):
+                pos = (0, self.board.w // 2 - self.select_pos[1],
+                       -self.board.h // 2 + self.select_pos[0])
+                world.sell(pos)
             elif key == ord(' '):
                 pos = (0, self.board.w // 2 - self.select_pos[1],
                        -self.board.h // 2 + self.select_pos[0])
@@ -34,7 +42,6 @@ class DemoGame(bonegame.GoBang):
                     self.obj = world.catch(pos)
                 else:
                     world.place(pos, self.obj)
-                    world.buy(0, (0, 2, 2))
                     self.obj = None
                 self.round += 1
 
@@ -45,7 +52,7 @@ world = World(path="./compile_test")
 print(world.states["player"])
 game = DemoGame(SIZE)
 
-world.buy(0, (0, 2, 2))
+# world.buy(0, (0, 2, 2))
 print(world.states['map'][0])
 while True:
     game.board.map = world.states['map'][0]

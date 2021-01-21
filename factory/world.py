@@ -42,7 +42,7 @@ class World(object):
 
     def load_dict(self, path=None):
         if path is not None:
-            self.compiler(path)
+            self.compiler.load(path)
         world_dict = self.compiler.world_dict
         self.commodities = []
         for c in world_dict["commodity"]:
@@ -59,6 +59,34 @@ class World(object):
             "player": VectorState(len(state), values=value, tag=state),  # Player state
             "market": self.market.state  # Market state
         }
+        for c in self.commodities:
+            positions = world_dict.get(c.name, ())
+            for p in positions:
+                self.place(eval(p), c.id)
+        self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.commodities}
+
+    def save_dict(self, path):
+        self.compiler.save(path)
+        world_dict = self.compiler.world_dict
+        self.commodities = []
+        for c in world_dict["commodity"]:
+            if c[2] == "material":
+                c_obj = Material(name=c[0], price=c[1])
+            else:
+                c_obj = Material(name=c[0], price=c[1])
+            self.commodities.append(c_obj)
+        size, num = world_dict["size"], world_dict["layer_num"]
+        state, value = world_dict["player_state"], world_dict["player_state_value"]
+        self.market = Market(*self.commodities)
+        self.states = {
+            "map": MatrixState(size, num),  # Map state
+            "player": VectorState(len(state), values=value, tag=state),  # Player state
+            "market": self.market.state  # Market state
+        }
+        for c in self.commodities:
+            positions = world_dict.get(c.name, ())
+            for p in positions:
+                self.place(eval(p), c.id)
         self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.commodities}
 
     def step(self):

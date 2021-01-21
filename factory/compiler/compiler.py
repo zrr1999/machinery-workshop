@@ -32,7 +32,7 @@ class Compiler(object):
             ],
         }
 
-    def __call__(self, path: str):
+    def load(self, path: str):
         region = re.compile(r"% *(.+)")
         command = re.compile(r"(.+): *(.+)")
         self.world_dict["commodity"] = []
@@ -46,6 +46,9 @@ class Compiler(object):
                 else:
                     current = res.group(1)
 
+    def save(self, path: str):
+        pass
+
     def compile_line(self, current, command, args):
         if command == "material":
             name, price = args.split(" ")
@@ -58,3 +61,6 @@ class Compiler(object):
         elif command == "initial":
             if current == "player":
                 self.world_dict["player_state_value"] = args.split(" ")
+        else:
+            self.world_dict.setdefault(command, [])
+            self.world_dict[command].extend(args.split(" "))
