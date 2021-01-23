@@ -5,6 +5,7 @@
 # @File : main.py
 # @desc : 本代码未经授权禁止商用
 from factory import World
+from factory import Compiler
 import bonegame
 
 
@@ -48,11 +49,12 @@ class DemoGame(bonegame.GoBang):
 
 SIZE = (9, 9)
 
-world = World(path="./compile_test")
-print(world.states["player"])
+compiler = Compiler()
+world = World()
 game = DemoGame(SIZE)
-
-# world.buy(0, (0, 2, 2))
+compiler.compile(path="./compile_test")
+world.load_dict(path="./compile_test")
+print(world.states["player"])
 print(world.states['map'][0])
 while True:
     game.board.map = world.states['map'][0]

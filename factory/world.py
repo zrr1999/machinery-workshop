@@ -5,6 +5,7 @@
 # @File : world.py
 # @desc : 本代码未经授权禁止商用
 import re
+import yaml
 from typing import Tuple, Union
 from factory.core import MatrixState, VectorState
 from factory.commodity import Commodity, Material
@@ -12,6 +13,7 @@ from factory.compiler import Compiler
 from .utils.typing import Pos, Size
 from .operation import Buy, Catch, Place, Sell
 from .transaction import Market
+
 
 # iron = Material(name="iron", price=5)  # 铁
 # screw = Material(name="screw", price=15)  # 螺丝
@@ -21,7 +23,7 @@ from .transaction import Market
 
 class World(object):
 
-    def __init__(self, size: Size = 5, coin=100, path=None):
+    def __init__(self, size: Size = 5, coin=100):
         """
 
         :param size: path为None时有效
@@ -32,18 +34,18 @@ class World(object):
         self.market = Market()
         self.states = {}
         self.buy_ops = {}
-        self.compiler = Compiler()
-        world_dict = self.compiler.world_dict
-        world_dict["player_state_value"][0] = coin
-        world_dict["size"] = size
-        self.load_dict(path)
+        # self.compiler = Compiler()
+        self.world_dict = {
+            "player_state_value": [coin],
+            "size": size
+        }
 
         # self.controller = Controller().add_sequence(ss=[init]).step(s)
 
     def load_dict(self, path=None):
-        if path is not None:
-            self.compiler.load(path)
-        world_dict = self.compiler.world_dict
+        with open(f"{path}.yaml", "r", encoding='utf-8') as file:
+            self.world_dict = yaml.load(file, Loader=yaml.FullLoader)
+        world_dict = self.world_dict
         self.commodities = []
         for c in world_dict["commodity"]:
             if c[2] == "material":
@@ -66,28 +68,10 @@ class World(object):
         self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.commodities}
 
     def save_dict(self, path):
-        self.compiler.save(path)
-        world_dict = self.compiler.world_dict
-        self.commodities = []
-        for c in world_dict["commodity"]:
-            if c[2] == "material":
-                c_obj = Material(name=c[0], price=c[1])
-            else:
-                c_obj = Material(name=c[0], price=c[1])
-            self.commodities.append(c_obj)
-        size, num = world_dict["size"], world_dict["layer_num"]
-        state, value = world_dict["player_state"], world_dict["player_state_value"]
-        self.market = Market(*self.commodities)
-        self.states = {
-            "map": MatrixState(size, num),  # Map state
-            "player": VectorState(len(state), values=value, tag=state),  # Player state
-            "market": self.market.state  # Market state
-        }
-        for c in self.commodities:
-            positions = world_dict.get(c.name, ())
-            for p in positions:
-                self.place(eval(p), c.id)
-        self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.commodities}
+        world_dict = self.world_dict
+        with open(f"{path}.yaml", 'w', encoding='utf-8') as file:
+            yaml.dump(world_dict, file, Dumper=yaml.Dumper)
+        raise NotImplementedError
 
     def step(self):
         return self.states

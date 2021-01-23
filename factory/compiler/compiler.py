@@ -5,6 +5,7 @@
 # @File : compiler.py
 # @desc : 本代码未经授权禁止商用
 import re
+import yaml
 from typing import List, Tuple
 from factory.core.state import MatrixState, VectorState
 from factory.commodity.material import Material
@@ -32,7 +33,7 @@ class Compiler(object):
             ],
         }
 
-    def load(self, path: str):
+    def compile(self, path: str):
         region = re.compile(r"% *(.+)")
         command = re.compile(r"(.+): *(.+)")
         self.world_dict["commodity"] = []
@@ -46,13 +47,13 @@ class Compiler(object):
                 else:
                     current = res.group(1)
 
-    def save(self, path: str):
-        pass
+        with open(f"{path}.yaml", 'w', encoding='utf-8') as file:
+            yaml.dump(self.world_dict, file, Dumper=yaml.Dumper)
 
     def compile_line(self, current, command, args):
-        if command == "material":
+        if command in ["material", "equipment"]:
             name, price = args.split(" ")
-            self.world_dict["commodity"].append((name, int(price), "material"))
+            self.world_dict["commodity"].append((name, int(price), command))
         elif command == "size":
             self.world_dict["size"] = eval(args)
         elif command == "vec":
@@ -60,7 +61,12 @@ class Compiler(object):
                 self.world_dict["player_state"] = args.split(" ")
         elif command == "initial":
             if current == "player":
-                self.world_dict["player_state_value"] = args.split(" ")
+                self.world_dict["player_state_value"] = list(map(eval, args.split(" ")))
         else:
             self.world_dict.setdefault(command, [])
             self.world_dict[command].extend(args.split(" "))
+
+
+if __name__ == '__main__':
+    import os
+    print(yaml.load(open("./generate.yaml", "r", encoding='utf-8'), Loader=yaml.FullLoader))
