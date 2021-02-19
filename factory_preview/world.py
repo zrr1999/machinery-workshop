@@ -10,9 +10,9 @@ from typing import Tuple, Union
 from factory.core import MatrixState, VectorState
 from factory.commodity import Commodity, Material
 from factory.compiler import Compiler
-from .utils.typing import Pos, Size
-from .operation import Buy, Catch, Place, Sell
-from .transaction import Market
+from factory.utils.typing import Pos, Size
+from factory.operation import Buy, Catch, Place, Sell
+from factory.transaction import Market
 
 
 # iron = Material(name="iron", price=5)  # 铁
@@ -23,11 +23,9 @@ from .transaction import Market
 
 class World(object):
 
-    def __init__(self, size: Size = 5, coin=100):
+    def __init__(self, size: Size = 5, coin:int=100):
         """
 
-        :param size: path为None时有效
-        :param coin: path为None时有效
         """
         self.commodities = []
         self.market = Market()
@@ -39,7 +37,7 @@ class World(object):
             "size": size
         }
 
-        # self.controller = Controller().add_sequence(ss=[init]).step(s)
+        self.plugins = []
 
     def load_dict(self, path=None):
         with open(f"{path}.yaml", "r", encoding='utf-8') as file:
@@ -73,6 +71,9 @@ class World(object):
         raise NotImplementedError
 
     def step(self):
+        for p in self.plugins:
+            p(self)
+
         return self.states
 
     def buy(self, commodity: Union[Commodity, str, int], position: Pos):
@@ -98,9 +99,5 @@ class World(object):
             op = Place(position, obj=obj)
             return op(self.states)
 
-    def analyze(self, string):
-        # mov: [[0, 1, 1], [0, 2, 1]]
-        pattern = re.compile(r"([A-z]+): *(.*)")
-        mov_pattern = re.compile(r"([A-z]+): *(.*)")
-
-        return pattern.search(string).groups()
+    def add_plugin(self, func):
+        self.plugins.append(func)

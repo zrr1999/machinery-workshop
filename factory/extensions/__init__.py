@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # _*_ coding: utf-8 _*_
-# @Time : 2020/11/19 22:23
+# @Time : 2021/2/19 21:12
 # @Author : 詹荣瑞
-# @File : parameters.py
+# @File : __init__.py.py
 # @desc : 本代码未经授权禁止商用
-EMPTY = 0
