@@ -71,6 +71,7 @@ class World(object):
         raise NotImplementedError
 
     def step(self):
+        # print("updates")
         for p in self.plugins:
             p(self)
 
@@ -99,5 +100,5 @@ class World(object):
             op = Place(position, obj=obj)
             return op(self.states)
 
-    def add_plugin(self, func):
-        self.plugins.append(func)
+    def add_plugin(self, *func):
+        self.plugins.extend(func)

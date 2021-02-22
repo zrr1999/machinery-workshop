@@ -7,23 +7,23 @@
 from factory_preview import World
 from factory import Compiler
 from factory.extensions.conveyor import Conveyor
+from factory.extensions.warehouse import Warehouse
 import bonegame
 import threading
+
+get = True
 
 
 class DemoGame(bonegame.GoBang):
     obj = 0
 
     def key_event(self, key, action, modifiers):
+        global get
         if action == "ACTION_PRESS":
             if key == ord('r'):
                 world.step()
-            elif key == ord(','):
-                self.camera.yaw += 1
-            elif key == ord('.'):
-                self.camera.yaw -= 1
-            elif key == ord('['):
-                self.camera.pitch -= 5
+            elif key == ord('z'):
+                get = not get
             elif key == ord('w'):
                 self.select_pos[1] += 1
             elif key == ord('a'):
@@ -55,24 +55,35 @@ SIZE = (9, 9)
 
 # 编译地图文件（只需要一次）
 compiler = Compiler()
-compiler.compile(path="./compile_test")
+compiler.compile(path="maps/compile_test")
 
 # 初始化游戏读取地图
 world = World()
-world.load_dict(path="./compile_test")
+world.load_dict(path="maps/compile_test")
 
-# 创建传送带并加载
-world.add_plugin(Conveyor(
-    [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]
-))
+# 创建工作台并加载
+warehouse1 = Warehouse((0, 0)).set({1: 100})  # 仓库
+conveyor = Conveyor([[0, 0], [0, 1], [1, 1], [1, 2], [2, 2]])  # 传送带
+warehouse2 = Warehouse((2, 2))
+
+
+# 逻辑帧
+def update():
+    if not get:
+        warehouse1.run(1)(world)
+    conveyor.run()(world)
+    if get:
+        warehouse2.run(1, True)(world)
+
+    timer = threading.Timer(1.0, update)  # 每隔1s执行一步
+    timer.start()
+
+
+update()
 
 # 显示游戏界面
 game = DemoGame(SIZE)
 print(world.states["player"])
-
-# 逻辑帧
-timer = threading.Timer(1.0, world.step)  # 每隔1s执行一步
-timer.start()
 while True:
     game.board.map = world.states['map'][0]  # 将逻辑地图复制到五子棋盘
     game.render()

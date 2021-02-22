@@ -14,9 +14,13 @@ class Conveyor(object):
     def __init__(self, paths: list):
         self.paths = np.array(paths)
 
-    def __call__(self, world: World):
-        world_map = world.states['map'][0]
-        caught_obj = world_map[tuple(self.paths[0])]
-        world_map[tuple(self.paths[1:].T)] = world_map[tuple(self.paths[:-1].T)]
-        if caught_obj != EMPTY:
-            print("传送带头部已放置物品")
+    def run(self):
+        def output(world: World):
+            world_map = world.states['map'][0]
+            caught_obj = world_map[tuple(self.paths[-1])]
+            if caught_obj != EMPTY:
+                print("传送带尾部已放置物品")
+            else:
+                world_map[tuple(self.paths[1:].T)] = world_map[tuple(self.paths[:-1].T)]
+                world_map[tuple(self.paths[0].T)] = EMPTY
+        return output
