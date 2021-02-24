@@ -5,7 +5,7 @@
 # @File : warehouse.py
 # @desc : 本代码未经授权禁止商用
 import numpy as np
-from factory.world import World
+from factory_preview.world import World
 from factory.parameters import EMPTY
 from factory.utils.typing import Pos
 from factory.commodity import Commodity
@@ -30,7 +30,7 @@ class Warehouse(object):
         if get:
             def output(world: World):
                 print(self.bag)
-                world_map = world.states['map'][0]
+                world_map = world.get_map_layer(0)
                 obj_target = world_map[self.pos]
                 if world_map[self.pos] == EMPTY:
                     print("仓库无法收取物品（不存在物品）")
@@ -47,7 +47,7 @@ class Warehouse(object):
             def output(world: World):
                 print(self.bag)
                 if obj in self.bag.keys() and self.bag[obj] > 0:
-                    world_map = world.states['map'][0]
+                    world_map = world.get_map_layer(0)
                     if world_map[self.pos] != EMPTY:
                         print("仓库无法放置物品（已存在物品）")
                     else:

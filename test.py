@@ -5,4 +5,4 @@
 # @File : test.py
 # @desc : 本代码未经授权禁止商用
 for i in {1: 2}.items():
-    print(i)
+    print(list({1: 2}.values()))

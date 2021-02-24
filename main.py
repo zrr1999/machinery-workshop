@@ -4,7 +4,7 @@
 # @Author : 詹荣瑞
 # @File : main.py
 # @desc : 本代码未经授权禁止商用
-from factory_preview import World
+from factory_preview import World, create_world_by_file
 from factory import Compiler
 from factory.extensions.conveyor import Conveyor
 from factory.extensions.warehouse import Warehouse
@@ -53,13 +53,8 @@ class DemoGame(bonegame.GoBang):
 
 SIZE = (9, 9)
 
-# 编译地图文件（只需要一次）
-compiler = Compiler()
-compiler.compile(path="maps/compile_test")
-
 # 初始化游戏读取地图
-world = World()
-world.load_dict(path="maps/compile_test")
+world = create_world_by_file(path="maps/compile_test", need_compile=True)
 
 # 创建工作台并加载
 warehouse1 = Warehouse((0, 0)).set({1: 100})  # 仓库
@@ -69,21 +64,20 @@ warehouse2 = Warehouse((2, 2))
 
 # 逻辑帧
 def update():
+    timer = threading.Timer(1.0, update)  # 每隔1s执行一步
+    timer.start()
     if not get:
         warehouse1.run(1)(world)
     conveyor.run()(world)
     if get:
         warehouse2.run(1, True)(world)
 
-    timer = threading.Timer(1.0, update)  # 每隔1s执行一步
-    timer.start()
-
 
 update()
 
 # 显示游戏界面
 game = DemoGame(SIZE)
-print(world.states["player"])
+print(world.state_manager.states_dict["player"])
 while True:
-    game.board.map = world.states['map'][0]  # 将逻辑地图复制到五子棋盘
+    game.board.map = world.get_map_layer(0)  # 将逻辑地图复制到五子棋盘
     game.render()

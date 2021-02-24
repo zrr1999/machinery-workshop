@@ -6,12 +6,6 @@
 # @desc : 本代码未经授权禁止商用
 import re
 import yaml
-from typing import List, Tuple
-from factory.core.state import MatrixState, VectorState
-from factory.commodity.material import Material
-from factory.utils.typing import Pos, Size
-from factory.operation import Buy, Catch, Place, Sell
-from factory.transaction import Market
 
 
 class Compiler(object):
@@ -67,6 +61,7 @@ class Compiler(object):
             self.world_dict[command].extend(args.split(" "))
 
 
+compiler = Compiler()
 if __name__ == '__main__':
     import os
     print(yaml.load(open("./generate.yaml", "r", encoding='utf-8'), Loader=yaml.FullLoader))

@@ -4,8 +4,7 @@
 # @Author : 詹荣瑞
 # @File : state.py
 # @desc : 本代码未经授权禁止商用
-from factory.utils.typing import Size
-from factory_preview.utils.typing import Union
+from factory_preview.utils.typing import Union, Size, Dict, Any
 import numpy as np
 
 
@@ -79,19 +78,33 @@ class VectorState(StateBase):
         return out
 
 
-class StateManager(object):
+class ManagerBase(object):
+    Type = Any
 
     def __init__(self):
         self.states_dict = {}
         self.states_list = []
 
-    def set(self, state, target: str = None):
+    def set(self, state: Type, target: str = None):
         if target is not None:
             self.states_dict.update({target: state})
             self.states_list.append(state)
+        return self
+
+    def set_states(self, states: Dict[Any, Type]):
+        self.states_dict.update(states)
+        self.states_list.extend(list(states.values()))
+        return self
 
     def get(self, target: Union[str, int]):
         if isinstance(target, str):
             return self.states_dict[target]
         else:
             return self.states_list[target]
+
+
+class StateManager(ManagerBase):
+    Type = StateBase
+
+    def operate(self, func: "OperationBase"):
+        return func(self.states_dict)

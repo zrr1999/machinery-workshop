@@ -6,12 +6,12 @@
 # @desc : 本代码未经授权禁止商用
 import re
 import yaml
-from typing import Tuple, Union
 from factory.core import MatrixState, VectorState
 from factory.commodity import Commodity, Material
-from factory.compiler import Compiler
-from factory.utils.typing import Pos, Size
-from factory.operation import Buy, Catch, Place, Sell
+from factory.compiler import compiler
+from factory_preview.utils.typing import Position, Size, Tuple, Union, ObjID
+from factory_preview.core.state import StateManager
+from factory_preview.operation import Buy, Catch, Place, Sell
 from factory.transaction import Market
 
 
@@ -20,85 +20,101 @@ from factory.transaction import Market
 # processor = Material(name="processor", price=20)  # 加工器
 # materials = [iron, screw, processor]
 
+def create_world_by_file(path: str, need_compile: bool = False):
+    """
+
+    :param path: 地图文件路径
+    :param need_compile: 是否需要编译地图文件
+    :return:
+    """
+    if need_compile:
+        compiler.compile(path)
+    with open(f"{path}.yaml", "r", encoding='utf-8') as file:
+        world_dict = yaml.load(file, Loader=yaml.FullLoader)
+    return create_world_by_dict(world_dict)
+
+
+def create_world_by_dict(world_dict: dict):
+    print(world_dict)
+    # 读取地图信息
+    size, num = world_dict["size"], world_dict["layer_num"]
+    world = World(size, num)
+    # 读取商品信息并放置商品
+    commodities = []
+    for c in world_dict["commodity"]:
+        if c[2] == "material":
+            c_obj = Material(name=c[0], price=c[1])
+        else:
+            c_obj = Material(name=c[0], price=c[1])
+        commodities.append(c_obj)
+    # 读取玩家信息
+    state, value = world_dict["player_state"], world_dict["player_state_value"]
+    world.state_manager.set_states({
+        "player": VectorState(len(state), values=value, tag=state),  # Player state
+    })
+    # 读取市场信息
+    world.market = Market(*commodities)
+
+    for m in commodities:
+        positions = world_dict.get(m.name, ())
+        for p in positions:
+            world.place(eval(p), m.id)
+
+    return world
+
+
+def world2dict():
+    pass
+    # with open(f"{path}.yaml", 'w', encoding='utf-8') as file:
+    #     yaml.dump(world_dict, file, Dumper=yaml.Dumper)
+
 
 class World(object):
 
-    def __init__(self, size: Size = 5, coin:int=100):
+    def __init__(self, size: Size, layer_num: int = 3):
         """
 
         """
         self.commodities = []
         self.market = Market()
-        self.states = {}
+        # self.states = {}
+        self.state_manager = StateManager().set_states({
+            "map": MatrixState(size, layer_num),  # Map state
+            "player": VectorState(2, values=[100, 1], tag=["coin", "level"]),  # Player state
+        })
         self.buy_ops = {}
-        # self.compiler = Compiler()
-        self.world_dict = {
-            "player_state_value": [coin],
-            "size": size
-        }
-
         self.plugins = []
 
-    def load_dict(self, path=None):
-        with open(f"{path}.yaml", "r", encoding='utf-8') as file:
-            self.world_dict = yaml.load(file, Loader=yaml.FullLoader)
-        world_dict = self.world_dict
-        self.commodities = []
-        for c in world_dict["commodity"]:
-            if c[2] == "material":
-                c_obj = Material(name=c[0], price=c[1])
-            else:
-                c_obj = Material(name=c[0], price=c[1])
-            self.commodities.append(c_obj)
-        size, num = world_dict["size"], world_dict["layer_num"]
-        state, value = world_dict["player_state"], world_dict["player_state_value"]
-        self.market = Market(*self.commodities)
-        self.states = {
-            "map": MatrixState(size, num),  # Map state
-            "player": VectorState(len(state), values=value, tag=state),  # Player state
-            "market": self.market.state  # Market state
-        }
-        for c in self.commodities:
-            positions = world_dict.get(c.name, ())
-            for p in positions:
-                self.place(eval(p), c.id)
-        self.buy_ops = {m.name: Buy(m, (), self.market) for m in self.commodities}
+    def get_map_layer(self, n_layer: int = 0):
+        return self.state_manager.get("map")[n_layer]
 
-    def save_dict(self, path):
-        world_dict = self.world_dict
-        with open(f"{path}.yaml", 'w', encoding='utf-8') as file:
-            yaml.dump(world_dict, file, Dumper=yaml.Dumper)
-        raise NotImplementedError
+    def get_map_value(self, pos: Position, n_layer: int = 0):
+        return self.get_map_layer(n_layer)[tuple(pos)]
+
+    def get_player_value(self, index: int):
+        return self.state_manager.get("player")[index]
 
     def step(self):
         # print("updates")
         for p in self.plugins:
             p(self)
 
-        return self.states
+        return self
 
-    def buy(self, commodity: Union[Commodity, str, int], position: Pos):
-        if isinstance(commodity, str):
-            buy = self.buy_ops.get(commodity)
-        elif isinstance(commodity, int):
-            buy = Buy(self.commodities[commodity], (), self.market)
-        else:
-            buy = Buy(commodity, (), self.market)
-        buy.pos = position
-        return buy(self.states)
+    def buy(self, obj_id: ObjID, position: Position):
+        return self.state_manager.operate(self.market.buy(obj_id, position))
 
-    def sell(self, position: Pos):
+    def sell(self, position: Position):
         op = Sell(position, self.market)
-        return op(self.states)
+        return op(self.state_manager.states_dict)
 
-    def catch(self, position: Pos):
+    def catch(self, position: Position):
         op = Catch(position)
-        return op(self.states)
+        return op(self.state_manager.states_dict)
 
-    def place(self, position: Pos, obj: int = None):
-        if obj is not None:
-            op = Place(position, obj=obj)
-            return op(self.states)
+    def place(self, position: Position, obj_id: ObjID):
+        op = Place(position, obj_id)
+        return op(self.state_manager.states_dict)
 
     def add_plugin(self, *func):
         self.plugins.extend(func)

@@ -5,7 +5,7 @@
 # @File : conveyor.py
 # @desc : 本代码未经授权禁止商用
 import numpy as np
-from factory.world import World
+from factory_preview.world import World
 from factory.parameters import EMPTY
 
 
@@ -16,7 +16,7 @@ class Conveyor(object):
 
     def run(self):
         def output(world: World):
-            world_map = world.states['map'][0]
+            world_map = world.get_map_layer(0)
             caught_obj = world_map[tuple(self.paths[-1])]
             if caught_obj != EMPTY:
                 print("传送带尾部已放置物品")
