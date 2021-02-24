@@ -17,10 +17,11 @@ class Conveyor(object):
     def run(self):
         def output(world: World):
             world_map = world.get_map_layer(0)
-            caught_obj = world_map[tuple(self.paths[-1])]
-            if caught_obj != EMPTY:
-                print("传送带尾部已放置物品")
-            else:
-                world_map[tuple(self.paths[1:].T)] = world_map[tuple(self.paths[:-1].T)]
-                world_map[tuple(self.paths[0].T)] = EMPTY
+
+            for i in range(self.paths.shape[0]-1, -1, -1):
+                caught_obj = world_map[tuple(self.paths[i])]
+                if caught_obj == EMPTY:
+                    world_map[tuple(self.paths[1:i+1].T)] = world_map[tuple(self.paths[:i].T)]
+                    world_map[tuple(self.paths[0].T)] = EMPTY
+                    break
         return output

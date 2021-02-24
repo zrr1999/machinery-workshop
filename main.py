@@ -45,10 +45,12 @@ class DemoGame(bonegame.GoBang):
                        -self.board.h // 2 + self.select_pos[0])
                 if self.round % 2 == 0:
                     self.obj = world.catch(pos)
+                    if self.obj:
+                        self.round += 1
                 else:
                     world.place(pos, self.obj)
                     self.obj = None
-                self.round += 1
+                    self.round += 1
 
 
 SIZE = (9, 9)
