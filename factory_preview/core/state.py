@@ -4,7 +4,7 @@
 # @Author : 詹荣瑞
 # @File : state.py
 # @desc : 本代码未经授权禁止商用
-from factory_preview.utils.typing import Union, Size, Dict, Any
+from factory_preview.utils.typing import Union, Size, Dict, Any, Callable
 import numpy as np
 
 
@@ -91,7 +91,7 @@ class ManagerBase(object):
             self.states_list.append(state)
         return self
 
-    def set_states(self, states: Dict[Any, Type]):
+    def set_states(self, states: Dict[Any, Type]) -> "ManagerBase":
         self.states_dict.update(states)
         self.states_list.extend(list(states.values()))
         return self
@@ -106,5 +106,5 @@ class ManagerBase(object):
 class StateManager(ManagerBase):
     Type = StateBase
 
-    def operate(self, func: "OperationBase"):
+    def operate(self, func: Callable[[dict], Any]):
         return func(self.states_dict)

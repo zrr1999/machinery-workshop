@@ -4,7 +4,7 @@
 # @Author : 詹荣瑞
 # @File : market.py
 # @desc : 本代码未经授权禁止商用
-from factory_preview.utils.typing import ObjID, Position
+from factory_preview.utils.typing import ObjID, Position, Callable
 from factory.core.state import VectorState
 from factory.commodity.material import Material
 from factory_preview.operation import Buy
@@ -30,7 +30,7 @@ class Market(object):
     def __getitem__(self, id: ObjID):
         return self.commodities[id-1]
 
-    def buy(self, obj_id: ObjID, pos: Position):
+    def buy(self, obj_id: ObjID, pos: Position) -> Callable[[dict], None]:
         return Buy(self.commodities[obj_id], pos)
 
     @property

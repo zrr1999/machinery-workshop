@@ -4,10 +4,9 @@
 # @Author : 詹荣瑞
 # @File : main.py
 # @desc : 本代码未经授权禁止商用
-from factory_preview import World, create_world_by_file
-from factory import Compiler
-from factory.extensions.conveyor import Conveyor
-from factory.extensions.warehouse import Warehouse
+from factory_preview import create_world_by_file
+from factory_preview.extensions.conveyor import Conveyor
+from factory_preview.extensions.warehouse import Warehouse
 import bonegame
 import threading
 

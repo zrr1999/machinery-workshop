@@ -22,7 +22,7 @@ class OperationBase(object):
     def __repr__(self):
         return self.NAME
 
-    def __call__(self, states: Dict[str, StateBase], controller: Controller = None, **kwargs):
+    def __call__(self, states: Dict[str, StateBase], controller: Controller = None, **kwargs)-> int:
         raise NotImplementedError
 
 
@@ -89,19 +89,16 @@ class Buy(OperationBase):
         self.coin = coin
         self.target = target
 
-    def __call__(self, states, controller=None, **kwargs):
+    def __call__(self, states, controller=None, **kwargs) -> None:
         ms = states[self.target[0]].state
         ps = states[self.target[1]].state
         if ps[self.coin] < self.goods.price:
             warnings.warn("货币不足")
-            return 0x0011
         elif ms[self.pos] != EMPTY:
             warnings.warn("你正在将一个物体放置到非空位置")
-            return 0x0002
         else:
             ps[self.coin] -= self.goods.price
             ms[self.pos] = self.goods.id
-            return 0
 
 
 class Sell(OperationBase):
