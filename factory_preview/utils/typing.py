@@ -5,6 +5,8 @@
 # @File : typing.py
 # @desc : 本代码未经授权禁止商用
 from typing import *
-Size = TypeVar("Size", Tuple[int, int], int)
-Position = TypeVar("Position", Tuple, List[int])
+Position = NewType("Position", Tuple)
 ObjID = NewType('ObjID', int)
+
+Size = TypeVar("Size", Tuple[int, int], int)
+Site = TypeVar("Site", Container, Position)

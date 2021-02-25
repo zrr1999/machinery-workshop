@@ -14,14 +14,12 @@ class Conveyor(object):
     def __init__(self, paths: list):
         self.paths = np.array(paths)
 
-    def run(self):
-        def output(world: World):
-            world_map = world.get_map_layer(0)
+    def run(self, world: World):
+        world_map = world.get_map_layer(0)
 
-            for i in range(self.paths.shape[0]-1, -1, -1):
-                caught_obj = world_map[tuple(self.paths[i])]
-                if caught_obj == EMPTY:
-                    world_map[tuple(self.paths[1:i+1].T)] = world_map[tuple(self.paths[:i].T)]
-                    world_map[tuple(self.paths[0].T)] = EMPTY
-                    break
-        return output
+        for i in range(self.paths.shape[0] - 1, -1, -1):
+            caught_obj = world_map[tuple(self.paths[i])]
+            if caught_obj == EMPTY:
+                world_map[tuple(self.paths[1:i + 1].T)] = world_map[tuple(self.paths[:i].T)]
+                world_map[tuple(self.paths[0].T)] = EMPTY
+                break
