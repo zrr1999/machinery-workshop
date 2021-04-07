@@ -6,3 +6,4 @@
 # @desc : 本代码未经授权禁止商用
 from .commodity import Commodity
 from .material import Material
+from .equipment import Equipment

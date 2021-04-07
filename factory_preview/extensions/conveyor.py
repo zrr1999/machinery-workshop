@@ -7,9 +7,10 @@
 import numpy as np
 from factory_preview.world import World
 from factory.parameters import EMPTY
+from factory_preview.extensions.extension import ExtensionBase
 
 
-class Conveyor(object):
+class Conveyor(ExtensionBase):
 
     def __init__(self, paths: list):
         self.paths = np.array(paths)

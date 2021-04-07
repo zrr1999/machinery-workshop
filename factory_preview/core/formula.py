@@ -9,11 +9,11 @@ from factory_preview.utils.typing import Position, List, ObjID, Dict
 
 class FormulaBase(object):
 
-    def __init__(self, raws: Dict[int, int], product: ObjID):
+    def __init__(self, raws: Dict[ObjID, int], product: Dict[ObjID, int]):
         self.raws = raws
         self.product = product
 
-    def compose(self, bag: Dict[int, int]):
+    def compose(self, bag: Dict[ObjID, int]):
         for r, num in self.raws.items():
             if r not in bag or bag[r]<num:
                 print(f"原材料<商品{r}>不足")
@@ -25,5 +25,5 @@ class FormulaBase(object):
 
 class SimpleFormula(FormulaBase):
 
-    def __init__(self, raws: List[int], product: ObjID):
-        super().__init__({r: 1 for r in raws}, product)
+    def __init__(self, raws: List[ObjID], product: ObjID):
+        super().__init__({r: 1 for r in raws}, {product: 1})

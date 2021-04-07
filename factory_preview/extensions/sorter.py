@@ -6,12 +6,13 @@
 # @desc : 本代码未经授权禁止商用
 from factory_preview import World
 from factory_preview.extensions.container import Container
+from factory_preview.extensions.extension import ExtensionBase
 from factory_preview.utils.typing import Union, Tuple, Position, Site, ObjID
 from factory_preview.core import StateBase, SimpleFormula, FormulaBase
 from factory_preview.parameters import EMPTY
 
 
-class Sorter(object):
+class Sorter(ExtensionBase):
 
     def __init__(self, site_source: Union[Container, Position],
                  site_target: Union[Container, Position], filtrate: ObjID):

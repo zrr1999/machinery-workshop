@@ -5,9 +5,10 @@
 # @File : container.py
 # @desc : 本代码未经授权禁止商用
 from factory_preview.utils.typing import ObjID, Position, Dict
+from factory_preview.extensions.extension import ExtensionBase
 
 
-class Container(object):
+class Container(ExtensionBase):
 
     def __init__(self, pos: Position):
         self.pos = pos
@@ -22,4 +23,7 @@ class Container(object):
         return self
 
     def get_stock(self, obj_id: ObjID) -> int:
+        raise NotImplementedError
+
+    def run(self, world):
         raise NotImplementedError

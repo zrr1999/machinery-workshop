@@ -9,7 +9,7 @@ import yaml
 from typing import Tuple, Union
 from factory.core import MatrixState, VectorState
 from factory.commodity import Commodity, Material
-from factory.compiler import Compiler
+from factory_preview.compiler import Compiler
 from .utils.typing import Pos, Size
 from .operation import Buy, Catch, Place, Sell
 from .transaction import Market

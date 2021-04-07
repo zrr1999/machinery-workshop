@@ -6,12 +6,13 @@
 # @desc : 本代码未经授权禁止商用
 import re
 import yaml
-from factory.core import MatrixState, VectorState
-from factory.commodity import Commodity, Material
-from factory.compiler import compiler
-from factory_preview.utils.typing import Position, Size, Tuple, Union, ObjID
+from factory_preview.core import MatrixState, VectorState, FormulaBase, SimpleFormula
+from factory.commodity import Commodity, Material, Equipment
+from factory_preview.compiler import compiler
+from factory_preview.utils.typing import Position, Size, Tuple, Union, ObjID, List
 from factory_preview.core.state import StateManager
 from factory_preview.operation import Buy, Catch, Place, Sell
+from factory_preview.extensions import ExtensionBase, Warehouse, Assembler
 from factory.transaction import Market
 
 
@@ -35,15 +36,35 @@ def create_world_by_file(path: str, need_compile: bool = False):
 
 
 def create_world_by_dict(world_dict: dict):
+    world_dict.setdefault("layer_num", 3)
     print(world_dict)
     # 读取地图信息
     size, num = world_dict["size"], world_dict["layer_num"]
     world = World(size, num)
     # 读取商品信息并放置商品
     commodities = []
-    for c in world_dict["commodity"]:
+    facilities = []
+    for c in world_dict["commodities"]:
         if c[2] == "material":
             c_obj = Material(name=c[0], price=c[1])
+        elif c[2] == "equipment":
+            c_obj = Equipment(name=c[0], price=c[1])
+            eps = world_dict.get(c[0], ())
+            if c[3] == "warehouse":
+                for i in range(0, len(eps), 2):
+                    facilities.append(
+                        Warehouse(eps[i]).set(eps[i + 1])
+                    )
+            elif c[3] == "assembler":
+                for i in range(0, len(eps), 3):
+                    formula = world_dict["formulas"][eps[i+2]]
+                    facilities.append(Assembler(eps[i]).set_formula(
+                        FormulaBase(
+                            formula["source"],
+                            formula["target"]
+                        )
+                    ).set(eps[i + 1]))
+
         else:
             c_obj = Material(name=c[0], price=c[1])
         commodities.append(c_obj)
@@ -58,9 +79,10 @@ def create_world_by_dict(world_dict: dict):
     for m in commodities:
         positions = world_dict.get(m.name, ())
         for p in positions:
-            world.place(eval(p), m.id)
+            if isinstance(p, Tuple):
+                world.place(p, m.id)
 
-    return world
+    return world, facilities
 
 
 def world2dict():
@@ -83,7 +105,7 @@ class World(object):
             "player": VectorState(2, values=[100, 1], tag=["coin", "level"]),  # Player state
         })
         self.buy_ops = {}
-        self.plugins = []
+        self.extensions: List[ExtensionBase] = []
 
     def get_map_layer(self, n_layer: int = 0):
         return self.state_manager.get("map")[n_layer]
@@ -93,13 +115,6 @@ class World(object):
 
     def get_player_value(self, index: int):
         return self.state_manager.get("player")[index]
-
-    def step(self):
-        # print("updates")
-        for p in self.plugins:
-            p(self)
-
-        return self
 
     def buy(self, obj_id: ObjID, position: Position):
         return self.state_manager.operate(self.market.buy(obj_id, position))
@@ -116,5 +131,9 @@ class World(object):
         op = Place(position, obj_id)
         return op(self.state_manager.states_dict)
 
-    def add_plugin(self, *func):
-        self.plugins.extend(func)
+    def add_extension(self, *extensions: ExtensionBase):
+        self.extensions.extend(extensions)
+
+    def update(self):
+        for extension in self.extensions:
+            extension.run(self)

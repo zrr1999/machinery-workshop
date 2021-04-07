@@ -55,6 +55,7 @@ class Place(OperationBase):
 
     def __call__(self, states, controller=None, **kwargs):
         state = states[self.target].state
+        print(self.pos)
         if state[self.pos] != EMPTY:
             warnings.warn("你正在将一个物体放置到非空位置")
         else:

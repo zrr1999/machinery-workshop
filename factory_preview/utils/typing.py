@@ -6,7 +6,7 @@
 # @desc : 本代码未经授权禁止商用
 from typing import *
 Position = NewType("Position", Tuple)
-ObjID = NewType('ObjID', int)
 
+ObjID = TypeVar('ObjID', int, float)
 Size = TypeVar("Size", Tuple[int, int], int)
 Site = TypeVar("Site", Container, Position)
