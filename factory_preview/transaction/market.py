@@ -7,22 +7,23 @@
 from factory_preview.utils.typing import ObjID, Position, Callable
 from factory.core.state import VectorState
 from factory.commodity.material import Material
-from factory_preview.operation import Buy
+# from factory_preview.operations.operation_base import Buy
 
 
 class Market(object):
 
-    def __init__(self, *materials: Material):
-        self._state = VectorState(3, values=[1, 1, 1])  # 通货膨胀、、
-        self.commodities = list(materials)
-        names = []
-        prices = []
-        for i, m in enumerate(materials):
+    def __init__(self, *commodities: Material):
+        self._state = VectorState(3, values=[1, 1, 1])  # 通货膨胀
+        self.ids = {}
+        self.names = {}
+        self.prices = {}
+        self.commodities = {}
+        for i, m in enumerate(commodities):
             m.id = i + 1
-            names.append(m.name)
-            prices.append(m.price)
-        self.names = names
-        self.prices = VectorState(len(self), values=prices)
+            self.commodities[m.id] = m
+            self.prices[m.id] = m.price
+            self.names[m.id] = m.name
+            self.ids[m.name] = m.id
 
     def __len__(self):
         return len(self.commodities)
@@ -31,15 +32,10 @@ class Market(object):
         return self.commodities[id-1]
 
     def buy(self, obj_id: ObjID, pos: Position) -> Callable[[dict], None]:
-        return Buy(self.commodities[obj_id], pos)
+        return Buy(obj_id, pos)
 
-    def get_id(self, obj_name:str):
-        obj_id = 0
-        for n in self.names:
-            obj_id+=1
-            if obj_name == n:
-                break
-        return obj_id
+    def get_id(self, obj_name: str):
+        return self.ids[obj_name]
 
     @property
     def state(self):

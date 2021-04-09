@@ -46,7 +46,7 @@ class World(object):
             self.world_dict = yaml.load(file, Loader=yaml.FullLoader)
         world_dict = self.world_dict
         self.commodities = []
-        for c in world_dict["commodity"]:
+        for c in world_dict["commodities"]:
             if c[2] == "material":
                 c_obj = Material(name=c[0], price=c[1])
             else:

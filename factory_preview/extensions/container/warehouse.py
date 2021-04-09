@@ -30,7 +30,7 @@ class Warehouse(Container):
 
     def run(self, world):
         obj_id, get = self.settings
-        print(self.bag)
+        # print(self.bag)
         # if get:
         #     world_map = world.get_map_layer(0)
         #     obj_target = world_map[self.pos]

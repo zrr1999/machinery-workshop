@@ -10,7 +10,6 @@ from factory_preview.extensions.container import Warehouse, Assembler
 from factory_preview.extensions.sorter import Sorter
 from factory_preview.core import SimpleFormula
 import threading
-SIZE = (9, 9)
 
 # 初始化游戏读取地图
 world, facilities = create_world_by_file(path="maps/task2.mmap", need_compile=True)

@@ -4,16 +4,15 @@
 # @Author : 詹荣瑞
 # @File : world.py
 # @desc : 本代码未经授权禁止商用
-import re
 import yaml
-from factory_preview.core import MatrixState, VectorState, FormulaBase, SimpleFormula
-from factory.commodity import Commodity, Material, Equipment
+from factory_preview.core import MatrixState, VectorState, FormulaBase
+from factory.commodity import Material, Equipment
 from factory_preview.compiler import Compiler
-from factory_preview.utils.typing import Position, Size, Tuple, Union, ObjID, List
+from factory_preview.utils.typing import Position, Size, Tuple, ObjID, List
 from factory_preview.core.state import StateManager
-from factory_preview.operation import Buy, Catch, Place, Sell
+# from factory_preview.operations.operation_base import Catch, Place, Sell
 from factory_preview.extensions import ExtensionBase, Warehouse, Assembler
-from factory.transaction import Market
+from factory_preview.transaction import Market
 
 
 # iron = Material(name="iron", price=5)  # 铁
@@ -106,6 +105,7 @@ class World(object):
         self.state_manager = StateManager().set_states({
             "map": MatrixState(size, layer_num),  # Map state
             "player": VectorState(2, values=[100, 1], tag=["coin", "level"]),  # Player state
+            "market": self.market.state,
         })
         self.buy_ops = {}
         self.extensions: List[ExtensionBase] = []
@@ -115,6 +115,9 @@ class World(object):
 
     def get_map_value(self, pos: Position, n_layer: int = 0):
         return self.get_map_layer(n_layer)[tuple(pos)]
+
+    def get_player_all_values(self):
+        return self.state_manager.get("player")[:]
 
     def get_player_value(self, index: int):
         return self.state_manager.get("player")[index]

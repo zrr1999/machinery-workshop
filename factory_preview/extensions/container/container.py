@@ -6,6 +6,7 @@
 # @desc : 本代码未经授权禁止商用
 from factory_preview.utils.typing import ObjID, Position, Dict
 from factory_preview.extensions.extension import ExtensionBase
+from factory_preview.utils import sum_dict
 
 
 class Container(ExtensionBase):
@@ -15,11 +16,7 @@ class Container(ExtensionBase):
         self.bag: Dict[int, int] = {}
 
     def set(self, objs: dict):
-        for obj, num in objs.items():
-            if obj in self.bag.keys():
-                self.bag[obj] += num
-            else:
-                self.bag.update({obj: num})
+        sum_dict(self.bag, objs)
         return self
 
     def get_stock(self, obj_id: ObjID) -> int:
