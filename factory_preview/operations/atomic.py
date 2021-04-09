@@ -6,26 +6,26 @@
 # @desc : 本代码未经授权禁止商用
 import warnings
 from .operation_base import OperationBase
-from factory.utils.typing import Pos, ObjId
-from factory.parameters import EMPTY
+from factory_preview.utils.typing import Position, ObjID
+from factory_preview.parameters import EMPTY
 
 
 class ObjPlace(OperationBase):
-    def __init__(self, position: Pos, obj_id: ObjId):
+    def __init__(self, obj_id: ObjID, position: Position):
         self.pos = position
         self.obj = obj_id
 
     def __call__(self, states, controller=None, **kwargs):
         state = states["map"].state
         if state[self.pos] != EMPTY:
-            warnings.warn(f"你正在将一个物体放置到非空位置{self.pos}")
+            print(f"你正在将一个物体放置到非空位置{self.pos}")
         else:
             state[self.pos] = self.obj
             return {}
 
 
 class ObjCatch(OperationBase):
-    def __init__(self, position: Pos):
+    def __init__(self, position: Position):
         self.pos = position
 
     def __call__(self, states, controller=None):
@@ -39,7 +39,7 @@ class ObjCatch(OperationBase):
 
 
 class ObjGet(OperationBase):
-    def __init__(self, obj_id: ObjId, amount: int):
+    def __init__(self, obj_id: ObjID, amount: int):
         self.obj = obj_id
         self.amount = amount
 
