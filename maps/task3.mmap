@@ -1,0 +1,21 @@
+% task
+仓库里竟然有一个加工台，把它拿出来试试吧。
+
+% statement
+material: 铁 5
+material: 铁棍 8
+material: 锤子 20
+equipment: 仓库 100 warehouse
+equipment: 锤子加工台 100 assembler
+formula: 铁*1+铁棍*1=锤子*1
+
+% market
+
+% player
+vec: 金币数 等级
+initial: 100 0
+
+% map
+size: (13,13)
+仓库: [(0,0,0), {1: 3, 2: 1}]
+锤子加工台: [(0,4,5), {}, 0]

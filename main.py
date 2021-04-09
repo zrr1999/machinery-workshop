@@ -13,7 +13,7 @@ import threading
 SIZE = (9, 9)
 
 # 初始化游戏读取地图
-world, facilities = create_world_by_file(path="maps/task3.mmap", need_compile=True)
+world, facilities = create_world_by_file(path="maps/task2.mmap", need_compile=True)
 
 # 创建工作台并加载
 warehouse = Warehouse((0, 0)).set({1: 100})  # 装入商品的仓库
@@ -26,7 +26,6 @@ conveyor = Conveyor([[0, 1], [1, 1], [1, 2]])  # 传送带
 
 
 # 逻辑帧
-print(facilities)
 def update():
     timer = threading.Timer(1.0, update)  # 每隔1s执行一步
     timer.start()

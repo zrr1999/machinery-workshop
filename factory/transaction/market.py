@@ -33,6 +33,14 @@ class Market(object):
     def buy(self, obj_id: ObjID, pos: Position) -> Callable[[dict], None]:
         return Buy(self.commodities[obj_id], pos)
 
+    def get_id(self, obj_name:str):
+        obj_id = 0
+        for n in self.names:
+            obj_id+=1
+            if obj_name == n:
+                break
+        return obj_id
+
     @property
     def state(self):
         return self._state.state

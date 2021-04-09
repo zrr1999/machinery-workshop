@@ -8,7 +8,7 @@ import re
 import yaml
 from factory_preview.core import MatrixState, VectorState, FormulaBase, SimpleFormula
 from factory.commodity import Commodity, Material, Equipment
-from factory_preview.compiler import compiler
+from factory_preview.compiler import Compiler
 from factory_preview.utils.typing import Position, Size, Tuple, Union, ObjID, List
 from factory_preview.core.state import StateManager
 from factory_preview.operation import Buy, Catch, Place, Sell
@@ -29,7 +29,7 @@ def create_world_by_file(path: str, need_compile: bool = False):
     :return:
     """
     if need_compile:
-        compiler.compile(path)
+        Compiler().compile(path)
     with open(f"{path}.yaml", "r", encoding='utf-8') as file:
         world_dict = yaml.load(file, Loader=yaml.FullLoader)
     return create_world_by_dict(world_dict)
@@ -47,8 +47,20 @@ def create_world_by_dict(world_dict: dict):
     for c in world_dict["commodities"]:
         if c[2] == "material":
             c_obj = Material(name=c[0], price=c[1])
+            commodities.append(c_obj)
         elif c[2] == "equipment":
             c_obj = Equipment(name=c[0], price=c[1])
+            commodities.append(c_obj)
+    # 读取玩家信息
+    state, value = world_dict["player_state"], world_dict["player_state_value"]
+    world.state_manager.set_states({
+        "player": VectorState(len(state), values=value, tag=state),  # Player state
+    })
+    # 读取市场信息
+    world.market = Market(*commodities)
+
+    for c in world_dict["commodities"]:
+        if c[2] == "equipment":
             eps = world_dict.get(c[0], ())
             if c[3] == "warehouse":
                 for i in range(0, len(eps), 2):
@@ -57,24 +69,15 @@ def create_world_by_dict(world_dict: dict):
                     )
             elif c[3] == "assembler":
                 for i in range(0, len(eps), 3):
-                    formula = world_dict["formulas"][eps[i+2]]
+                    formula = world_dict["formulas"][eps[i + 2]]
+                    formula = FormulaBase(
+                        formula["source"],
+                        formula["target"]
+                    )
+                    formula.format(world.market)
                     facilities.append(Assembler(eps[i]).set_formula(
-                        FormulaBase(
-                            formula["source"],
-                            formula["target"]
-                        )
+                        formula
                     ).set(eps[i + 1]))
-
-        else:
-            c_obj = Material(name=c[0], price=c[1])
-        commodities.append(c_obj)
-    # 读取玩家信息
-    state, value = world_dict["player_state"], world_dict["player_state_value"]
-    world.state_manager.set_states({
-        "player": VectorState(len(state), values=value, tag=state),  # Player state
-    })
-    # 读取市场信息
-    world.market = Market(*commodities)
 
     for m in commodities:
         positions = world_dict.get(m.name, ())

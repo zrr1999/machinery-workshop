@@ -1,0 +1,18 @@
+% task
+info: 工厂好乱，收拾一下，把散落在地上的铁都收到左侧墙角吧。
+target: [[]]
+
+% statement
+material: 铁 5
+material: 铁棍 8
+
+% market
+
+% player
+vec: 金币数 等级
+initial: 100 0
+
+% map
+size: (9,9)
+铁: [(0,0,1), (0,2,2), (0,5,1)]
+铁棍: [(0,7,5)]

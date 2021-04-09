@@ -31,7 +31,7 @@ class Assembler(Container):
 
     def set(self, objs: dict):
         for obj, num in objs.items():
-            if obj == self.formula.product or obj in self.formula.raws:
+            if obj in self.formula.product or obj in self.formula.raws:
                 self.bag[obj] += num
             else:
                 print("制造台只能放置原材料或制造物品")
@@ -50,8 +50,9 @@ class Assembler(Container):
 
     def run(self, world):
         if self.progress == self.cost_time:
+            self.progress = 0
             product = self.formula.compose(self.bag)
             if product is not None:
-                self.bag[product] += 1
+                self.set(product)
         else:
             self.progress += 1

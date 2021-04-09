@@ -1,0 +1,19 @@
+% info
+工厂还有一个仓库，把铁块都放到仓库里吧。
+
+% statement
+material: 铁 5
+material: 铁棍 8
+equipment: 仓库 100 warehouse
+
+% market
+
+% player
+vec: 金币数 等级
+initial: 100 0
+
+% map
+size: (13,13)
+铁: [(0,0,3), (0,0,4), (0,1,3)]
+铁棍: [(0,1,4)]
+仓库: [(0,0,0), {}]

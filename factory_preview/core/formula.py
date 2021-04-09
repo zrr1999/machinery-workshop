@@ -22,6 +22,19 @@ class FormulaBase(object):
             bag[r] -= num
         return self.product
 
+    def format(self, market):
+        raws = {}
+        product = {}
+        for key, value in self.raws.items():
+            raws[market.get_id(key)] = value
+        for key, value in self.product.items():
+            product[market.get_id(key)] = value
+        self.raws = raws
+        self.product = product
+        return self
+
+
+
 
 class SimpleFormula(FormulaBase):
 

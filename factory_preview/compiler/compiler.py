@@ -37,6 +37,7 @@ class Compiler(object):
 
         with open(f"{path}.yaml", 'w', encoding='utf-8') as file:
             yaml.dump(self.world_dict, file, Dumper=yaml.Dumper)
+        return self
 
     def compile_line(self, current, command, args):
         if current == "player":
@@ -82,9 +83,10 @@ class Compiler(object):
                 self.world_dict[command].extend(eval(args))
 
 
-compiler = Compiler()
-if __name__ == '__main__':
-    import os
+def compile(path):
+    return Compiler().compile(path)
 
-    compiler.compile("../../maps/task3.mmap")
-    print(compiler.world_dict["formulas"])
+
+if __name__ == '__main__':
+    print(compile("../../maps/task3.mmap").world_dict["formulas"])
+
