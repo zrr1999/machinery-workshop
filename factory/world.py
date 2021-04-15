@@ -6,10 +6,9 @@
 # @desc : 本代码未经授权禁止商用
 import re
 import yaml
-from typing import Tuple, Union
+from typing import Union
 from factory.core import MatrixState, VectorState
 from factory.commodity import Commodity, Material
-from factory_preview.compiler import Compiler
 from .utils.typing import Pos, Size
 from .operation import Buy, Catch, Place, Sell
 from .transaction import Market

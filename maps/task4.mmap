@@ -14,8 +14,8 @@ formula: 铁*1=铁棍*1
 % market
 
 % player
-vec: 金币数 等级
-initial: 100 0
+金币数: 100
+等级: 1
 
 % map
 size: (13,13)

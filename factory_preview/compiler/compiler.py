@@ -4,89 +4,106 @@
 # @Author : 詹荣瑞
 # @File : compiler.py
 # @desc : 本代码未经授权禁止商用
-import re
-import yaml
-from pyparsing import Regex, nums, Word, ZeroOrMore, Group, Suppress, Optional
+import json
+from pyparsing import Regex, Word, ZeroOrMore, Group, Suppress, Optional, nums, alphas
+
+word = Regex(r"[\u4E00-\u9FA5A-Za-z0-9_]+")
+commodity = word
+tuple_parser = word + ZeroOrMore(Suppress(",") + word)
+commodities = commodity + Optional(Suppress("*") + Word(nums)).addParseAction(
+    lambda res: int(res[0]) if res else 1
+)
+commodities.addParseAction(lambda res: {
+    res[0]: res[1]
+})
+sources = commodities + ZeroOrMore(Suppress("+") + commodities)
+sources.addParseAction(lambda res: {
+    k: v for rd in res for k, v in rd.items()
+})
+formula_parser = sources + Suppress("=") + commodities
 
 
-class Compiler(object):
-    """
-    完成 material，
-    """
+def parse_statement(command_lines, world_dict):
+    for line in command_lines:
+        command, args = line
+        if command == "material":
+            args = tuple_parser.parseString(args)
+            args[1] = int(args[1])
+            world_dict["commodities"][args[0]] = [*args[1:], command, []]
+        elif command == "equipment":
+            args = tuple_parser.parseString(args)
+            args[1] = int(args[1])
+            world_dict["commodities"][args[0]] = [args[1], f"{command}/{args[2]}", []]
+        elif command == "formula":
+            s, t = formula_parser.parseString(args)
+            world_dict["formulas"].append({
+                "source": s,
+                "task": t
+            })
 
+
+def parse_player(command_lines, world_dict):
+    world_dict["playerState"] = {c[0]: eval(c[1]) for c in command_lines}
+
+
+def parse_task(command_lines, world_dict):
+    world_dict["task"] = [[c[0], *eval(c[1])] for c in command_lines]
+
+
+def parse_map(command_lines, world_dict):
+    for line in command_lines:
+        command, args = line
+        args = eval(args)
+        if command == "size":
+            world_dict["mapSize"] = args
+        else:
+            world_dict["commodities"][command].extend(args)
+
+
+parsers = {
+    "statement": parse_statement,
+    "player": parse_player,
+    "map": parse_map,
+    "task": parse_task,
+}
+
+
+class Parser(object):
     def __init__(self):
-        self.world_dict = {
+        self.world_dict = {}
+
+    def parse(self, path: str):
+        world_dict = {
+            'mapLayer': 3,
+            "formulas": [],
+            "commodities": {},
+            "task": [],
         }
 
-    def compile(self, path: str):
-        word = r"[\u4E00-\u9FA5A-Za-z0-9_]"
-        region = re.compile(r"%\s*(\S+)")
-        command = re.compile(r"(\S+):\s*(.+)")
+        word = Regex(r"[\u4E00-\u9FA5A-Za-z0-9_]+")
+        block_header = Suppress("%") + Word(alphas)
+        block_command = Group(word + Suppress(":") + Regex(r".+"))
+        block = Group(block_header + Group(ZeroOrMore(block_command)))
+        parser = ZeroOrMore(block)
+        with open(path, encoding="utf-8") as file:
+            blocks = parser.parseString(file.read())
 
-        self.world_dict["commodities"] = []
-        self.world_dict["formulas"] = []
-        with open(path, 'r', encoding="utf-8") as file:
-            for line in file.readlines():
-                res = region.search(line)
-                if res is None:
-                    res = command.search(line)
-                    if res is not None:
-                        self.compile_line(current, *res.groups())
-                else:
-                    current = res.group(1)
-
-        with open(f"{path}.yaml", 'w', encoding='utf-8') as file:
-            yaml.dump(self.world_dict, file, Dumper=yaml.Dumper)
+        for block in blocks:
+            head, command_lines = block
+            try:
+                parsers[head](command_lines, world_dict)
+            except KeyError:
+                print(head)
+                print("")
+        self.world_dict = world_dict
+        with open(f"{path.replace('.mmap', '')}.json", 'w', encoding='utf-8') as file:
+            json.dump(self.world_dict, file, ensure_ascii=False, indent=2)
         return self
 
-    def compile_line(self, current, command, args):
-        if current == "player":
-            if command == "vec":
-                self.world_dict["player_state"] = args.split(" ")
-            elif command == "initial":
-                self.world_dict["player_state_value"] = list(map(eval, args.split(" ")))
-        elif current == "task":
-            pass
-        else:
-            if command == "material":
-                name, price = args.split(" ")
-                self.world_dict["commodities"].append(
-                    (name, int(price), command)
-                )
-            elif command == "equipment":
-                name, price, ep = args.split(" ")
-                self.world_dict["commodities"].append(
-                    (name, int(price), command, ep)
-                )
-            elif command == "size":
-                self.world_dict["size"] = eval(args)
-            elif command == "formula":
-                commodity = Regex(r"[\u4E00-\u9FA5A-Za-z0-9_]+")
-                commodities = commodity + Optional(Suppress("*") + Word(nums)).addParseAction(
-                    lambda res: int(res[0]) if res else 1
-                )
-                commodities.addParseAction(lambda res: {
-                    res[0]: res[1]
-                })
-                sources = commodities + ZeroOrMore(Suppress("+") + commodities)
-                sources.addParseAction(lambda res: {
-                    k: v for rd in res for k, v in rd.items()
-                })
-                parser_formula = sources + Suppress("=") + commodities
-                s, t = parser_formula.parseString(args)
-                self.world_dict["formulas"].append({
-                    "source": s,
-                    "target": t
-                })
-            else:
-                self.world_dict.setdefault(command, [])
-                self.world_dict[command].extend(eval(args))
 
-
-def compile(path):
-    return Compiler().compile(path)
+def parse(path):
+    return Parser().parse(path)
 
 
 if __name__ == '__main__':
-    print(compile("../../maps/task3.mmap").world_dict["formulas"])
-
+    print(parse("../../maps/task1.mmap").world_dict)

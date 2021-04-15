@@ -1,16 +1,16 @@
 % info
-工厂还有一个仓库，把铁块都放到仓库里吧。
+1:工厂还有一个仓库，把铁块都放到仓库里吧。
 
 % statement
-material: 铁 5
-material: 铁棍 8
-equipment: 仓库 100 warehouse
+material: 铁, 5
+material: 铁棍, 8
+equipment: 仓库, 100, warehouse
 
 % market
 
 % player
-vec: 金币数 等级
-initial: 100 0
+金币数: 100
+等级: 1
 
 % map
 size: (13,13)

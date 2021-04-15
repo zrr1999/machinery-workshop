@@ -12,6 +12,7 @@ from apiflask.validators import Length, OneOf
 from flask import request, jsonify
 
 from factory_preview import create_world_by_file
+from factory_preview.extensions.conveyor import Conveyor
 
 global_data = {}
 app = APIFlask(__name__)
@@ -26,7 +27,7 @@ class JsonRpcInSchema(Schema):
 
 class JsonRpcOutSchema(Schema):
     jsonrpc = String(required=True, validate=OneOf(["2.0"]))
-    result = Field(required=True)
+    result = List(Field, required=True)
     id = Number(required=True)
 
 
@@ -55,13 +56,19 @@ def debug(data):
     if data["method"] == "start":
         world, facilities = create_world_by_file(path="maps/task3.mmap", need_compile=True)
         global_data['world'], global_data['facilities'] = world, facilities
-        world.add_extension(*facilities)
+        conveyor = Conveyor([[0, 1], [1, 1], [1, 2]])  # 传送带
+        world.add_extension(*facilities, conveyor)
     elif data["method"] == "update":
         if world is not None:
             world.update()
-    elif data["method"] == "action":
-        x, y = data["params"]
-        world.buy(1, (0, y, x))
+    elif "action" in data["method"]:
+        if world is not None:
+            x, y = data["params"]
+            if data["method"] == "action/buy":
+                world.buy(1, (0, y, x))
+            else:
+                world.sell((0, y, x))
+
     response["result"] = [
         world.get_map_layer().tolist(),
         world.get_player_all_values().tolist()
@@ -99,4 +106,22 @@ def save():
 
 
 if __name__ == '__main__':
-    app.run(port=6954)
+    app.run(port=7474)
+    test_dict = {
+        'mapSize': [13, 13],
+        'mapLayer': 3,
+
+        'formulas': [],
+        'commodities': [
+            ['铁', 5, 'material', [[0, 0, 3], [0, 0, 4], [0, 1, 3]]],
+            ['铁棍', 8, 'material', [[0, 1, 4]]],
+            ['仓库', 100, 'equipment/warehouse', [[0, 0, 0], {}]]
+        ],
+
+        'playerState': [['金币数', 100], ['等级', 1]],
+
+        "target": [
+            ["map", [1, [0, 0, 3]]],
+            ["player", [1, 200]],
+        ]
+    }

@@ -1,18 +1,19 @@
+% info
+description: 工厂好乱，收拾一下，把散落在地上的铁都收到左侧墙角吧。
+
 % task
-info: 工厂好乱，收拾一下，把散落在地上的铁都收到左侧墙角吧。
-target: [[]]
+map: [[[0, 0, 3], 1], ]
+player: [[1, 200], ]
 
 % statement
-material: 铁 5
-material: 铁棍 8
-
-% market
+material: 铁, 5
+material: 铁棍, 8
 
 % player
-vec: 金币数 等级
-initial: 100 0
+金币数: 100
+等级: 1
 
 % map
-size: (9,9)
-铁: [(0,0,1), (0,2,2), (0,5,1)]
-铁棍: [(0,7,5)]
+size: [9,9]
+铁: [[0,0,1], [0,2,2], [0,5,1]]
+铁棍: [[0,7,5]]

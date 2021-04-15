@@ -30,8 +30,8 @@ from typing import Dict, Union
 
 
 class Buy(OperationSequence):
-    def __init__(self, obj_id: ObjID, world):
-        price = world.market.prices[obj_id]
+    def __init__(self, obj_id: ObjID, market):
+        price = market.prices[obj_id]
         super().__init__(
             ValueDown(0, price),
             ObjGet(obj_id, 1)
@@ -50,12 +50,12 @@ class Buy(OperationSequence):
 
 
 class Sell(ValueUp):
-    def __init__(self, objs: Union[Dict[ObjID, int], ObjID], world):
+    def __init__(self, objs: Union[Dict[ObjID, int], ObjID], market):
         if isinstance(objs, int):
-            price = world.market.prices[objs]
+            price = market.prices[objs]
         else:
             price = 0
-            for obj_id, num in objs:
-                price += num * world.market.prices[obj_id]
+            for obj_id, num in objs.items():
+                price += num * market.prices[obj_id]
 
         super().__init__(0, price)

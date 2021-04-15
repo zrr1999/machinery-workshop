@@ -30,7 +30,7 @@ class OperationSequence(OperationBase):
         for op in self.ops:
             out = op(states, controller)
             if out is not None:
-                sum_dict(obj_dict, op(states, controller))
+                sum_dict(obj_dict, out)
             else:
                 break
         return obj_dict

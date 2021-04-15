@@ -4,13 +4,16 @@
 # @Author : 詹荣瑞
 # @File : world.py
 # @desc : 本代码未经授权禁止商用
+import json
+
 import yaml
 from factory_preview.core import MatrixState, VectorState, FormulaBase
 from factory.commodity import Material, Equipment
-from factory_preview.compiler import Compiler
-from factory_preview.utils.typing import Position, Size, Tuple, ObjID, List
+from factory.compiler import Compiler
+from factory_preview.compiler import Parser
+from factory_preview.utils.typing import Position, Size, ObjID, List
 from factory_preview.core.state import StateManager
-# from factory_preview.operations.operation_base import Catch, Place, Sell
+from factory_preview.operations import ObjCatch, ObjPlace, Sell
 from factory_preview.extensions import ExtensionBase, Warehouse, Assembler
 from factory_preview.transaction import Market
 
@@ -20,71 +23,76 @@ from factory_preview.transaction import Market
 # processor = Material(name="processor", price=20)  # 加工器
 # materials = [iron, screw, processor]
 
-def create_world_by_file(path: str, need_compile: bool = False):
+def create_world_by_mmap(path: str):
     """
 
     :param path: 地图文件路径
-    :param need_compile: 是否需要编译地图文件
     :return:
     """
-    if need_compile:
-        Compiler().compile(path)
-    with open(f"{path}.yaml", "r", encoding='utf-8') as file:
-        world_dict = yaml.load(file, Loader=yaml.FullLoader)
+    return create_world_by_dict(Parser().parse(path).world_dict)
+
+
+def create_world_by_json(path: str):
+    """
+
+    :param path: 地图json文件路径
+    :return:
+    """
+    with open(path, "r", encoding='utf-8') as file:
+        world_dict = json.load(file)
     return create_world_by_dict(world_dict)
 
 
 def create_world_by_dict(world_dict: dict):
-    world_dict.setdefault("layer_num", 3)
-    print(world_dict)
     # 读取地图信息
-    size, num = world_dict["size"], world_dict["layer_num"]
-    world = World(size, num)
+    world = World(world_dict["mapSize"], world_dict["mapLayer"], world_dict["task"])
+    # 读取公式信息
+    formulas = world_dict["formulas"]
     # 读取商品信息并放置商品
     commodities = []
-    facilities = []
-    for c in world_dict["commodities"]:
-        if c[2] == "material":
-            c_obj = Material(name=c[0], price=c[1])
-            commodities.append(c_obj)
-        elif c[2] == "equipment":
-            c_obj = Equipment(name=c[0], price=c[1])
-            commodities.append(c_obj)
-    # 读取玩家信息
-    state, value = world_dict["player_state"], world_dict["player_state_value"]
-    world.state_manager.set_states({
-        "player": VectorState(len(state), values=value, tag=state),  # Player state
-    })
-    # 读取市场信息
-    world.market = Market(*commodities)
+    materials, equipments = [], []
 
-    for c in world_dict["commodities"]:
-        if c[2] == "equipment":
-            eps = world_dict.get(c[0], ())
-            if c[3] == "warehouse":
+    for index, (name, args) in enumerate(world_dict["commodities"].items()):
+        if args[1] == "material":
+            materials.append(index + 1)
+            c_obj = Material(name=name, price=args[0])
+            commodities.append(c_obj)
+            for p in args[2]:
+                world.place(index + 1, tuple(p))
+        elif "equipment" in args[1]:
+            equipments.append(index + 1)
+            c_obj = Equipment(name=name, price=args[0])
+            commodities.append(c_obj)
+            eps = args[2]
+            if args[1] == "equipment/warehouse":
                 for i in range(0, len(eps), 2):
-                    facilities.append(
+                    world.add_extension(
                         Warehouse(eps[i]).set(eps[i + 1])
                     )
-            elif c[3] == "assembler":
+                    world.place(index + 1, tuple(eps[i]))
+            elif args[1] == "equipment/assembler":
                 for i in range(0, len(eps), 3):
-                    formula = world_dict["formulas"][eps[i + 2]]
-                    formula = FormulaBase(
-                        formula["source"],
-                        formula["target"]
+                    f = formulas[eps[i + 2]]
+                    f = FormulaBase(
+                        f["source"],
+                        f["target"]
                     )
-                    formula.format(world.market)
-                    facilities.append(Assembler(eps[i]).set_formula(
-                        formula
-                    ).set(eps[i + 1]))
+                    formulas[eps[i + 2]] = f
+                    world.add_extension(Assembler(eps[i]).set_formula(f).set(eps[i + 1]))
+                    world.place(index + 1, tuple(eps[i]))
+    # 读取市场信息
+    world.market = Market(*commodities)
+    for f in formulas:
+        if isinstance(f, FormulaBase):
+            f.format(world.market)
+    # 读取玩家信息
+    state = world_dict["playerState"]
+    tags, values = list(state.keys()), list(state.values())
+    world.state_manager.set_states({
+        "player": VectorState(len(tags), values=values, tag=tags),  # Player state
+    })
 
-    for m in commodities:
-        positions = world_dict.get(m.name, ())
-        for p in positions:
-            if isinstance(p, Tuple):
-                world.place(p, m.id)
-
-    return world, facilities
+    return world, materials, equipments
 
 
 def world2dict():
@@ -95,7 +103,7 @@ def world2dict():
 
 class World(object):
 
-    def __init__(self, size: Size, layer_num: int = 3):
+    def __init__(self, size: Size, layer_num: int = 3, tasks=None):
         """
 
         """
@@ -109,6 +117,7 @@ class World(object):
         })
         self.buy_ops = {}
         self.extensions: List[ExtensionBase] = []
+        self.tasks = tasks or []
 
     def get_map_layer(self, n_layer: int = 0):
         return self.state_manager.get("map")[n_layer]
@@ -126,15 +135,18 @@ class World(object):
         return self.state_manager.operate(self.market.buy(obj_id, position))
 
     def sell(self, position: Position):
-        op = Sell(position, self.market)
-        return op(self.state_manager.states_dict)
+        obj = ObjCatch(position)(self.state_manager.states_dict)
+        if obj is not None:
+            sell = Sell(obj, self.market)
+            sell(self.state_manager.states_dict)
+        return {}
 
     def catch(self, position: Position):
-        op = Catch(position)
+        op = ObjCatch(position)
         return op(self.state_manager.states_dict)
 
-    def place(self, position: Position, obj_id: ObjID):
-        op = Place(position, obj_id)
+    def place(self, obj_id: ObjID, position: Position):
+        op = ObjPlace(obj_id, position)
         return op(self.state_manager.states_dict)
 
     def add_extension(self, *extensions: ExtensionBase):
@@ -143,3 +155,20 @@ class World(object):
     def update(self):
         for extension in self.extensions:
             extension.run(self)
+        for t in self.tasks:
+            target, (index, value) = t
+            index = tuple(index)
+            if target == "map" and self.state_manager.get(target)[index] != value:
+                return False
+            if target == "player" and self.state_manager.get(target)[index] != value:
+                return False
+        return True
+
+
+if __name__ == '__main__':
+    world, mts, eqs = create_world_by_mmap(
+        "../maps/task1.mmap"
+    )
+
+    print(world, mts, eqs)
+    print(world.update())
