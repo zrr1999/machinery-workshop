@@ -38,7 +38,7 @@ def parse_statement(command_lines, world_dict):
             s, t = formula_parser.parseString(args)
             world_dict["formulas"].append({
                 "source": s,
-                "task": t
+                "target": t
             })
 
 
@@ -47,7 +47,7 @@ def parse_player(command_lines, world_dict):
 
 
 def parse_task(command_lines, world_dict):
-    world_dict["task"] = [[c[0], *eval(c[1])] for c in command_lines]
+    world_dict["task"] = [[c[0], task] for c in command_lines for task in eval(c[1])]
 
 
 def parse_map(command_lines, world_dict):
@@ -57,7 +57,7 @@ def parse_map(command_lines, world_dict):
         if command == "size":
             world_dict["mapSize"] = args
         else:
-            world_dict["commodities"][command].extend(args)
+            world_dict["commodities"][command][2].extend(args)
 
 
 parsers = {
@@ -90,9 +90,9 @@ class Parser(object):
 
         for block in blocks:
             head, command_lines = block
-            try:
+            if head in parsers:
                 parsers[head](command_lines, world_dict)
-            except KeyError:
+            else:
                 print(head)
                 print("")
         self.world_dict = world_dict

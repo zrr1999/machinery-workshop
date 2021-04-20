@@ -1,24 +1,27 @@
-% task
-铁棍不够了，试试可不可以用铁造铁棍。
+% info
+description: 铁棍不够了，试试可不可以用铁造铁棍。
 
 % statement
-material: 铁 5
-material: 铁棍 8
-material: 锤子 20
-equipment: 仓库 100 warehouse
-equipment: 锤子加工台 100 assembler
-equipment: 铁棍加工台 100 assembler
+material: 铁, 5
+material: 铁棍, 8
+material: 锤子, 20
+equipment: 仓库, 100, warehouse
+equipment: 锤子加工台, 100, assembler
+equipment: 铁棍加工台, 100, assembler
 formula: 铁*1+铁棍*1=锤子*1
 formula: 铁*1=铁棍*1
 
-% market
+% task
+map: [[[0, 0, 3], 3], [[0, 0, 4], 3]]
+player: [[1, 0], ]
 
 % player
 金币数: 100
 等级: 1
 
 % map
-size: (13,13)
-仓库: [(0,0,0), {1: 3, 2: 1}]
+size: [9,9]
+锤子: [[0, 0, 3],]
+仓库: [(0,0,0), {1: 2, 2: 0}]
 锤子加工台: [(0,4,5), {}, 0]
 铁棍加工台: [(0,5,5), {}, 1]

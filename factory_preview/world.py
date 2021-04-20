@@ -18,18 +18,15 @@ from factory_preview.extensions import ExtensionBase, Warehouse, Assembler
 from factory_preview.transaction import Market
 
 
-# iron = Material(name="iron", price=5)  # 铁
-# screw = Material(name="screw", price=15)  # 螺丝
-# processor = Material(name="processor", price=20)  # 加工器
-# materials = [iron, screw, processor]
-
 def create_world_by_mmap(path: str):
     """
 
     :param path: 地图文件路径
     :return:
     """
-    return create_world_by_dict(Parser().parse(path).world_dict)
+    parser = Parser().parse(path)
+    print(parser.world_dict)
+    return create_world_by_dict(parser.world_dict)
 
 
 def create_world_by_json(path: str):
@@ -52,6 +49,7 @@ def create_world_by_dict(world_dict: dict):
     commodities = []
     materials, equipments = [], []
 
+    print(world_dict["commodities"])
     for index, (name, args) in enumerate(world_dict["commodities"].items()):
         if args[1] == "material":
             materials.append(index + 1)
@@ -97,8 +95,6 @@ def create_world_by_dict(world_dict: dict):
 
 def world2dict():
     pass
-    # with open(f"{path}.yaml", 'w', encoding='utf-8') as file:
-    #     yaml.dump(world_dict, file, Dumper=yaml.Dumper)
 
 
 class World(object):
@@ -118,6 +114,8 @@ class World(object):
         self.buy_ops = {}
         self.extensions: List[ExtensionBase] = []
         self.tasks = tasks or []
+
+        self.success = False
 
     def get_map_layer(self, n_layer: int = 0):
         return self.state_manager.get("map")[n_layer]
@@ -153,15 +151,16 @@ class World(object):
         self.extensions.extend(extensions)
 
     def update(self):
+
         for extension in self.extensions:
             extension.run(self)
         for t in self.tasks:
             target, (index, value) = t
-            index = tuple(index)
-            if target == "map" and self.state_manager.get(target)[index] != value:
+            if target == "map" and self.state_manager.get(target)[tuple(index)] != value:
                 return False
-            if target == "player" and self.state_manager.get(target)[index] != value:
+            if target == "player" and self.state_manager.get(target)[index] < value:
                 return False
+        self.success = True
         return True
 
 
