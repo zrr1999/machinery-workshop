@@ -27,7 +27,7 @@ class Assembler(Container):
         if obj_id in self.bag:
             return self.bag[obj_id]
         else:
-            return -1
+            return 0
 
     def set(self, objs: dict):
         for obj, num in objs.items():

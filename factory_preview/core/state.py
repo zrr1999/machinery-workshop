@@ -26,6 +26,12 @@ class StateBase(object):
     def __repr__(self):
         return str(self)
 
+    def __eq__(self, other):
+        return self.state == other
+
+    def count(self, obj_id: int):
+        return np.sum(self.state == obj_id)
+
 
 class MatrixState(StateBase):
     """
@@ -34,7 +40,7 @@ class MatrixState(StateBase):
     其中 n 为层数，分别为状态的高度和宽度。
     """
 
-    def __init__(self, size: Size = 3, num_layers: int = 1, values=None, dtype=np.int, tag=None):
+    def __init__(self, size: Size = 3, num_layers: int = 1, values=None, dtype=np.int32, tag=None):
         """
 
         :param size: 状态的尺寸，即 (h, w)
@@ -71,7 +77,7 @@ class VectorState(StateBase):
     def __str__(self):
         if self.tag is None:
             self.tag = []
-        self.tag += ["undefined"]*(len(self.state) - len(self.tag))
+        self.tag += ["undefined"] * (len(self.state) - len(self.tag))
         out = "["
         out += ", ".join(f"{t}({s})" for s, t in zip(self.state, self.tag))
         out += "]"
@@ -96,7 +102,7 @@ class ManagerBase(object):
         self.states_list.extend(list(states.values()))
         return self
 
-    def get(self, target: Union[str, int]):
+    def get(self, target: Union[str, int]) -> Type:
         if isinstance(target, str):
             return self.states_dict[target]
         else:

@@ -1,5 +1,5 @@
 % info
-description: 没有材料了，我们还有100个金币，试试花费金币购买材料。
+description: 没有材料了，我们还有100个金币，试试花费金币购买材料造5个锤子。
 
 % statement
 material: 铁, 5
@@ -12,7 +12,7 @@ formula: 铁*1+铁棍*1=锤子*1
 formula: 铁*1=铁棍*1
 
 % task
-map: [[[0, 1, 3], 1], [[0, 1, 4], 2]]
+commodities: [[3, 5], ]
 
 % player
 金币数: 100

@@ -4,4 +4,4 @@
 # @Author : 詹荣瑞
 # @File : __init__.py.py
 # @desc : 本代码未经授权禁止商用
-from .compiler import Parser, parse
+from .parser import Parser, parse

@@ -12,8 +12,8 @@ formula: 铁*1+铁棍*1=锤子*1
 formula: 铁*1=铁棍*1
 
 % task
-map: [[[0, 0, 3], 3], [[0, 0, 4], 3]]
 player: [[1, 0], ]
+commodities: [[3, 2], ]
 
 % player
 金币数: 100

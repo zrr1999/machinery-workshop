@@ -6,16 +6,15 @@
 # @desc : 本代码未经授权禁止商用
 import json
 
-import yaml
-from factory_preview.core import MatrixState, VectorState, FormulaBase
-from factory.commodity import Material, Equipment
-from factory.compiler import Compiler
+import numpy as np
+
+from factory_preview.commodities import Material, Equipment
 from factory_preview.compiler import Parser
-from factory_preview.utils.typing import Position, Size, ObjID, List
-from factory_preview.core.state import StateManager
+from factory_preview.core import StateManager, MatrixState, VectorState, FormulaBase
 from factory_preview.operations import ObjCatch, ObjPlace, Sell
-from factory_preview.extensions import ExtensionBase, Warehouse, Assembler
+from factory_preview.extensions import ExtensionBase, Warehouse, Assembler, Container
 from factory_preview.transaction import Market
+from factory_preview.utils.typing import Position, Size, ObjID, List
 
 
 def create_world_by_mmap(path: str):
@@ -25,7 +24,6 @@ def create_world_by_mmap(path: str):
     :return:
     """
     parser = Parser().parse(path)
-    print(parser.world_dict)
     return create_world_by_dict(parser.world_dict)
 
 
@@ -49,7 +47,6 @@ def create_world_by_dict(world_dict: dict):
     commodities = []
     materials, equipments = [], []
 
-    print(world_dict["commodities"])
     for index, (name, args) in enumerate(world_dict["commodities"].items()):
         if args[1] == "material":
             materials.append(index + 1)
@@ -151,7 +148,6 @@ class World(object):
         self.extensions.extend(extensions)
 
     def update(self):
-
         for extension in self.extensions:
             extension.run(self)
         for t in self.tasks:
@@ -160,7 +156,15 @@ class World(object):
                 return False
             if target == "player" and self.state_manager.get(target)[index] < value:
                 return False
+            if target == "commodities":
+                stock = self.state_manager.get("map").count(index)
+                for ex in self.extensions:
+                    if isinstance(ex, Container):
+                        stock += ex.get_stock(index)
+                if stock < value:
+                    return False
         self.success = True
+        print("Task success.")
         return True
 
 

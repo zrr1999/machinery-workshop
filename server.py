@@ -67,8 +67,6 @@ def map_editor(data: JsonRpcIn):
         "id": data.id,
         "jsonrpc": "2.0",
         "result": {
-            "map": world.get_map_layer().tolist(),
-            "player": world.get_player_all_values().tolist()
         }
     }
 

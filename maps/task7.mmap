@@ -14,6 +14,9 @@ formula: 铁*1+铁棍*1=锤子*1
 formula: 铁*1=铁棍*1
 formula: 铁*2+铁棍*1=螺丝刀*1
 
+% task
+commodities: [[4, 10], ]
+
 % player
 金币数: 0
 等级: 1

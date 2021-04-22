@@ -14,6 +14,7 @@ formula: 铁*1=铁棍*1
 % player
 金币数: 87
 等级: 1
+commodities: [[3, 10], ]
 
 % map
 size: [9,9]
