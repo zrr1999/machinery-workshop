@@ -14,7 +14,7 @@ from factory_preview.core import StateManager, MatrixState, VectorState, Formula
 from factory_preview.operations import ObjCatch, ObjPlace, Sell
 from factory_preview.extensions import ExtensionBase, Warehouse, Assembler, Container
 from factory_preview.transaction import Market
-from factory_preview.utils.typing import Position, Size, ObjID, List
+from factory_preview.utils.typing import Position, Size, ObjID, List, Dict
 
 
 def create_world_by_mmap(path: str):
@@ -61,10 +61,11 @@ def create_world_by_dict(world_dict: dict):
             eps = args[2]
             if args[1] == "equipment/warehouse":
                 for i in range(0, len(eps), 2):
-                    world.add_extension(
-                        Warehouse(eps[i]).set(eps[i + 1])
-                    )
+                    warehouse = Warehouse(eps[i]).set(eps[i + 1])
+                    world.add_extension(warehouse)
+                    world.facilities[index] = warehouse
                     world.place(index + 1, tuple(eps[i]))
+                    world.place(index, (1, *eps[i][1:]))
             elif args[1] == "equipment/assembler":
                 for i in range(0, len(eps), 3):
                     f = formulas[eps[i + 2]]
@@ -73,8 +74,12 @@ def create_world_by_dict(world_dict: dict):
                         f["target"]
                     )
                     formulas[eps[i + 2]] = f
-                    world.add_extension(Assembler(eps[i]).set_formula(f).set(eps[i + 1]))
+
+                    assembler = Assembler(eps[i]).set_formula(f).set(eps[i + 1])
+                    world.add_extension(assembler)
+                    world.facilities[index] = assembler
                     world.place(index + 1, tuple(eps[i]))
+                    world.place(index, (1, *eps[i][1:]))
     # 读取市场信息
     world.market = Market(*commodities)
     for f in formulas:
@@ -110,6 +115,7 @@ class World(object):
         })
         self.buy_ops = {}
         self.extensions: List[ExtensionBase] = []
+        self.facilities: Dict[int, Container] = {}
         self.tasks = tasks or []
 
         self.success = False
@@ -170,8 +176,9 @@ class World(object):
 
 if __name__ == '__main__':
     world, mts, eqs = create_world_by_mmap(
-        "../maps/task1.mmap"
+        "../maps/task3.mmap"
     )
 
     print(world, mts, eqs)
-    print(world.update())
+    print(world.get_map_layer(1))
+    print(world.facilities)
